@@ -1,0 +1,4 @@
+master_uri: "ws://localhost:1246"
+allow_ports:
+  - 25565
+redirect_port: 25566
