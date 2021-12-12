@@ -1,0 +1,64 @@
+{
+  "servers": {
+    "7721": {
+      "name": "Paradise Main",
+      "ip": "127.0.0.1",
+      "port": 7721,
+      "topic": "?status",
+      "format": "json",
+      "queued": true,
+      "desc": "Основной сервер",
+      "extra": "(НСН Керберос)"
+    },
+    "7722": {
+      "name": "WL Prime",
+      "ip": "10.222.2.7",
+      "port": 7722,
+      "topic": "?status",
+      "format": "json",
+      "queued": false,
+      "desc": "здесь играют стримеры",
+      "extra": "(НСН Кибериада)"
+    },
+    "7723": {
+      "name": "Paradise WL",
+      "ip": "10.222.2.7",
+      "port": 7723,
+      "topic": "?status",
+      "format": "json",
+      "queued": false,
+      "desc": "вайтлист, без временных ограничений по профессиям, самозапись через команду <b>/заявка</b> в Discord (Требуется суммарно 75+ часов игрового опыта на EX/Main/Secondary)",
+      "extra": "(НСН Керберос/НСН Кибериада)"
+    },
+    "7724": {
+      "name": "Paradise Extended eXperimental",
+      "ip": "ex.ss220.space",
+      "port": 7724,
+      "topic": "?status",
+      "format": "json",
+      "queued": false,
+      "desc": "очень долгие раунды без раундстартовых антагов",
+      "extra": "(НСН Кибериада)"
+    },
+    "7725": {
+      "name": "Bay12 Sierra",
+      "ip": "10.222.2.7",
+      "port": 7725,
+      "topic": "?status",
+      "format": "uri",
+      "queued": false,
+      "desc": "атмосферное и более требовательное РП, билд Infinity",
+      "extra": "(ИКН Сьерра)"
+    },
+    "7726": {
+      "name": "Paradise Secondary",
+      "ip": "127.0.0.1",
+      "port": 7726,
+      "topic": "?status",
+      "format": "json",
+      "queued": true,
+      "desc": "Второй сервер, копия основного для равномерного распределения онлайна",
+      "extra": "(НСН Керберос) <b style='color: #2ecc71'>(новый)</b>"
+    }
+  }
+}
