@@ -1,52 +1,64 @@
 import {
-  ConnectedSocket,
   MessageBody,
-  OnGatewayConnection,
-  OnGatewayDisconnect,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
   WsResponse,
 } from '@nestjs/websockets';
-// import { from, Observable } from 'rxjs';
-// import { map } from 'rxjs/operators';
-import { Server } from 'ws';
-import { Logger } from '@nestjs/common';
-import { Socket } from 'net';
+import {Server} from 'ws';
+import {forwardRef, Inject, Logger} from '@nestjs/common';
+import {concat, filter, from, map, Observable} from 'rxjs';
+import {EventsService} from "./events.service";
+import {PassService} from "../pass/pass.service";
+
+
+export class IptablesInitRequestDto {
+  ports: number[]
+}
+
+export class IptablesInitialMessageDto {
+  accepts: {
+    [index: number]: string[]
+  }
+}
+
+export class IptablesEventMessageDto {
+  action: string
+  inbound_address: string
+  target_port: number
+}
 
 @WebSocketGateway(8080)
-export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class EventsGateway {
+  constructor(
+    @Inject(forwardRef(() => PassService))
+    private readonly passService: PassService,
+    @Inject(forwardRef(() => EventsService))
+    private readonly eventService: EventsService
+  ) {}
+
   @WebSocketServer() server: Server;
-  private logger: Logger = new Logger('AppGateway');
+  private logger: Logger = new Logger(EventsGateway.name);
 
-  @SubscribeMessage('events')
-  handleEvent(@MessageBody() data: unknown, @ConnectedSocket() client: Socket): WsResponse<unknown> {
-    const event = 'events';
-    return { event, data };
+  @SubscribeMessage('iptables')
+  handleEvent(@MessageBody() data: IptablesInitRequestDto): Observable<WsResponse<any>> {
+    this.logger.error(`iptables-control-daemon connected for ports: [${data.ports}]`);
+    const initial = (async () => {
+      const message = new IptablesInitialMessageDto()
+      message.accepts = {}
+      for (const port of data.ports) {
+        message.accepts[port] = await this.passService.getPasses(port)
+      }
+      return message
+    })()
+
+    return concat(
+      from(initial).pipe(map((data) => ({event: "Initial", data: <IptablesInitialMessageDto>data}))),
+      this.eventService.events
+        .pipe(
+          filter((message) => message && data.ports.includes(message.target_port)),
+          map((data) => ({event: "Event", data: <IptablesEventMessageDto>data}))
+        )
+    )
   }
-
-  @SubscribeMessage('msgToServer')
- handleMessage(client: any, payload: string): void {
-  this.server.emit('msgToClient', payload);
- }
-
- afterInit(server: Server) {
-  this.logger.log('Init');
- }
-
- handleDisconnect(client: any) {
-  this.logger.log(`Client disconnected: ${client}`);
- }
-
- handleConnection(client: any, ...args: any[]) {
-  // this.server.emit('events', JSON.stringify({
-  //   "hello": "world"
-  // }));
-  console.log(typeof client)
-  client.emit("connected", "successful")
-  setTimeout(() => {
-    client.emit('MY_EVENT', 'some value');
-  }, 1000)
-  this.logger.log(`Client connected: ${client}`);
- }
 }

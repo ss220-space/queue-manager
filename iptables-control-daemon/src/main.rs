@@ -2,16 +2,16 @@ mod fwmanage;
 
 use std::collections::{HashMap, HashSet};
 
-use std::net::{Ipv4Addr, SocketAddrV4};
+use std::net::Ipv4Addr;
 use log::LevelFilter;
 use tokio_tungstenite::connect_async;
 use tokio_tungstenite::tungstenite::http::Uri;
 use serde::Serialize;
 use serde::Deserialize;
-use serde_json::Value;
+use serde_json::{json, Value};
 use simplelog::{ColorChoice, Config, TerminalMode, TermLogger};
 use tokio_tungstenite::tungstenite::{Message, Result};
-use futures_util::StreamExt;
+use futures_util::{SinkExt, StreamExt};
 use crate::fwmanage::FwChain;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -30,12 +30,13 @@ enum Action {
 #[derive(Deserialize, Debug)]
 struct EventMessage {
     action: Action,
-    inbound: SocketAddrV4
+    inbound_address: Ipv4Addr,
+    target_port: u16
 }
 
 #[derive(Deserialize, Debug)]
 struct InitialMessage {
-    accepts: Vec<SocketAddrV4>
+    accepts: HashMap<u16, HashSet<Ipv4Addr>>
 }
 
 
@@ -97,26 +98,28 @@ async fn process(config: DConfig) -> Result<()> {
 
     let mut state: FwState = Default::default();
 
+    let message = json!({
+        "event": "iptables",
+        "data": {
+            "ports": config.allow_ports
+        }
+    });
+    stream.send(Message::text(serde_json::to_string(&message).unwrap())).await?;
+    stream.flush().await?;
+
     while let Some(message) = stream.next().await {
         let message = message?;
         match message {
             Message::Text(text) => {
                 let value: Value = serde_json::from_str(text.as_str()).unwrap();
 
-                match value["@type"].as_str().unwrap() {
+                match value["event"].as_str().unwrap() {
                     "Initial" => {
-                        let message: InitialMessage = serde_json::from_value(value).unwrap();
+                        let message: InitialMessage = serde_json::from_value(value["data"].clone()).unwrap();
 
                         log::debug!("Got message: {:?}", message);
 
-                        let mut by_port: HashMap<u16, HashSet<Ipv4Addr>> = HashMap::new();
-                        for address in message.accepts {
-                            by_port.entry(address.port())
-                                .or_default()
-                                .insert(address.ip().clone());
-                        }
-
-                        for (port, accepts) in by_port {
+                        for (port, accepts) in message.accepts {
                             if let Some(chain) = state.provide_chain(&config, port) {
                                 chain.update_accepts(accepts).unwrap();
                             } else {
@@ -125,13 +128,13 @@ async fn process(config: DConfig) -> Result<()> {
                         }
                     }
                     "Event" => {
-                        let message: EventMessage = serde_json::from_value(value).unwrap();
+                        let message: EventMessage = serde_json::from_value(value["data"].clone()).unwrap();
                         log::debug!("Got message: {:?}", message);
 
-                        if let Some(chain) = state.provide_chain(&config, message.inbound.port()) {
+                        if let Some(chain) = state.provide_chain(&config, message.target_port) {
                             match message.action {
-                                Action::ALLOW => chain.add_accept(message.inbound.ip().clone()).unwrap(),
-                                Action::REVOKE => chain.remove_accept(message.inbound.ip().clone()).unwrap()
+                                Action::ALLOW => chain.add_accept(message.inbound_address.clone()).unwrap(),
+                                Action::REVOKE => chain.remove_accept(message.inbound_address.clone()).unwrap()
                             };
                         } else {
                             log::error!("Received EventMessage for not-allowed port: {:?}", message);
