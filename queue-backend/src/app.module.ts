@@ -11,16 +11,16 @@ import configuration from './config/configuration';
 
 @Module({
   imports: [
-    QueueModule,
-    WebhooksModule,
-    ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       load: [configuration],
     }),
     RedisModule.register({
-      url: process.env.REDIS_URL
+      url: process.env.REDIS_URL || 'redis://127.0.0.1:6379'
     }),
     ByondModule,
+    QueueModule,
+    WebhooksModule,
+    ScheduleModule.forRoot(),
     TasksModule,
   ],
 })
