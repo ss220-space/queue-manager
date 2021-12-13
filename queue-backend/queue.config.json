@@ -1,5 +1,16 @@
 {
   "servers": {
+    "7720": {
+      "name": "Test",
+      "ip": "127.0.0.1",
+      "port": 7720,
+      "topic": "?status",
+      "format": "json",
+      "queued": true,
+      "desc": "Тестовый сервер",
+      "extra": "",
+      "test": true
+    },
     "7721": {
       "name": "Paradise Main",
       "ip": "127.0.0.1",

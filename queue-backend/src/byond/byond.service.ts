@@ -24,4 +24,26 @@ export class ByondService {
       return null
     }
   };
+
+  async getPlayerlistExt(id: string): Promise<any> {
+    const server = { ...queueConfig.servers[id] }
+    server.topic = '?playerlist_ext'
+  
+    try {
+      const queryByond = await fetchByond(server)
+  
+      switch(server.format) {
+        case 'json':
+          return await JSON.parse(queryByond)
+        case 'uri':
+          return Object.fromEntries(new URLSearchParams(queryByond).entries())
+        default:
+          return null
+      }
+    } catch (err) {
+      console.error(`Failed to getStatus with id ${id}`);
+      console.error(err);
+      return null
+    }
+  }
 }
