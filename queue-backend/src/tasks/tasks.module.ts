@@ -1,12 +1,15 @@
 import { Module } from '@nestjs/common';
 import { RedisModule } from 'nestjs-redis';
-import { ByondService } from '@/src/byond/byond.service';
 import { TasksService } from './tasks.service';
+import { ByondModule } from '../byond/byond.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
     RedisModule,
+    ByondModule,
+    ConfigModule,
   ],
-  providers: [TasksService, ByondService],
+  providers: [TasksService],
 })
 export class TasksModule {}
