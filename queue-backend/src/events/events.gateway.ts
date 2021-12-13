@@ -5,11 +5,11 @@ import {
   WebSocketServer,
   WsResponse,
 } from '@nestjs/websockets';
-import {Server} from 'ws';
-import {forwardRef, Inject, Logger} from '@nestjs/common';
-import {concat, filter, from, map, Observable} from 'rxjs';
-import {EventsService} from "./events.service";
-import {PassService} from "../pass/pass.service";
+import { Server } from 'ws';
+import { forwardRef, Inject, Logger } from '@nestjs/common';
+import { concat, filter, from, map, Observable } from 'rxjs';
+import { EventsService } from "./events.service";
+import { PassService } from "../pass/pass.service";
 
 
 export class IptablesInitRequestDto {
@@ -35,7 +35,7 @@ export class EventsGateway {
     private readonly passService: PassService,
     @Inject(forwardRef(() => EventsService))
     private readonly eventService: EventsService
-  ) {}
+  ) { }
 
   @WebSocketServer() server: Server;
   private logger: Logger = new Logger(EventsGateway.name);
@@ -53,11 +53,11 @@ export class EventsGateway {
     })()
 
     return concat(
-      from(initial).pipe(map((data) => ({event: "Initial", data: <IptablesInitialMessageDto>data}))),
+      from(initial).pipe(map((data) => ({ event: "Initial", data: <IptablesInitialMessageDto>data }))),
       this.eventService.events
         .pipe(
           filter((message) => message && data.ports.includes(message.target_port)),
-          map((data) => ({event: "Event", data: <IptablesEventMessageDto>data}))
+          map((data) => ({ event: "Event", data: <IptablesEventMessageDto>data }))
         )
     )
   }

@@ -7,7 +7,7 @@ export class WebhooksService {
   private readonly redis: any;
   constructor(
     private readonly redisService: RedisService,
-  ) { 
+  ) {
     this.redis = this.redisService.getClient()
   }
 

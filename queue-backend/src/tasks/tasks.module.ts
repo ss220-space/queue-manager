@@ -12,4 +12,4 @@ import { ConfigModule } from '@nestjs/config';
   ],
   providers: [TasksService],
 })
-export class TasksModule {}
+export class TasksModule { }

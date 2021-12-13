@@ -7,4 +7,4 @@ import { ByondService } from './byond.service';
   providers: [ByondService],
   exports: [ByondService]
 })
-export class ByondModule {}
+export class ByondModule { }

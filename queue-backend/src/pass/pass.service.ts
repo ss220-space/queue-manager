@@ -1,16 +1,18 @@
-import {Injectable} from "@nestjs/common";
-import {RedisService} from "nestjs-redis";
-import {EventsService} from "../events/events.service";
-import IORedis from "ioredis";
+import { Injectable } from "@nestjs/common";
+import { RedisService } from "nestjs-redis";
+import { EventsService } from "../events/events.service";
+import { Redis } from "ioredis";
 
 @Injectable()
 export class PassService {
-  constructor(private readonly redisService: RedisService,
-              private readonly eventsService: EventsService) {
-    this.redis = redisService.getClient()
+  constructor(
+    private readonly redisService: RedisService,
+    private readonly eventsService: EventsService
+  ) {
+    this.redis = this.redisService.getClient()
   }
 
-  private redis: IORedis.Redis
+  private redis: Redis
 
   async addPass(playerIp: string, serverPort: number): Promise<void> {
     if (!await this.redis.sadd(`passes_${serverPort}`, playerIp)) {

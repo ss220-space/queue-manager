@@ -6,11 +6,11 @@ import fetchByond from './http2byond'
 export class ByondService {
   async getStatus(id: string): Promise<any> {
     const server = queueConfig.servers[id];
-  
+
     try {
       const queryByond = await fetchByond(server)
-  
-      switch(server.format) {
+
+      switch (server.format) {
         case 'json':
           return await JSON.parse(queryByond)
         case 'uri':
@@ -28,11 +28,11 @@ export class ByondService {
   async getPlayerlistExt(id: string): Promise<any> {
     const server = { ...queueConfig.servers[id] }
     server.topic = '?playerlist_ext'
-  
+
     try {
       const queryByond = await fetchByond(server)
-  
-      switch(server.format) {
+
+      switch (server.format) {
         case 'json':
           return await JSON.parse(queryByond)
         case 'uri':
