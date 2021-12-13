@@ -1,16 +1,5 @@
-import { IsNotEmpty, IsPort, Validate, ValidationArguments, ValidatorConstraint, ValidatorConstraintInterface } from 'class-validator';
-import queueConfig from '@/queue.config.json'
-
-@ValidatorConstraint({ name: 'ServerExistsRule', async: true })
-export class ServerExistsRule implements ValidatorConstraintInterface {
-  async validate(value: string): Promise<boolean> {
-    return (value in queueConfig.servers)
-  }
-
-  defaultMessage(args: ValidationArguments): string {
-    return `Server ${args.value} doesn't exists`;
-  }
-}
+import { ServerExistsRule } from '@/src/common/validator/serverExist.validator';
+import { IsNotEmpty, IsPort, Validate,  } from 'class-validator';
 
 export class QueueRequestDto {
   @IsPort()
