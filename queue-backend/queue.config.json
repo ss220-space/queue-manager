@@ -9,6 +9,7 @@
       "queued": true,
       "desc": "Тестовый сервер",
       "extra": "",
+      "connection_address": "game.ss220.space",
       "test": true
     },
     "7721": {
@@ -19,7 +20,8 @@
       "format": "json",
       "queued": true,
       "desc": "Основной сервер",
-      "extra": "(НСН Керберос)"
+      "extra": "(НСН Керберос)",
+      "connection_address": "game.ss220.space"
     },
     "7722": {
       "name": "WL Prime",
@@ -29,7 +31,8 @@
       "format": "json",
       "queued": false,
       "desc": "здесь играют стримеры",
-      "extra": "(НСН Кибериада)"
+      "extra": "(НСН Кибериада)",
+      "connection_address": "play.ss220.space"
     },
     "7723": {
       "name": "Paradise WL",
@@ -39,7 +42,8 @@
       "format": "json",
       "queued": false,
       "desc": "вайтлист, без временных ограничений по профессиям, самозапись через команду <b>/заявка</b> в Discord (Требуется суммарно 75+ часов игрового опыта на EX/Main/Secondary)",
-      "extra": "(НСН Керберос/НСН Кибериада)"
+      "extra": "(НСН Керберос/НСН Кибериада)",
+      "connection_address": "play.ss220.space"
     },
     "7724": {
       "name": "Paradise Extended eXperimental",
@@ -49,7 +53,8 @@
       "format": "json",
       "queued": false,
       "desc": "очень долгие раунды без раундстартовых антагов",
-      "extra": "(НСН Кибериада)"
+      "extra": "(НСН Кибериада)",
+      "connection_address": "ex.ss220.space"
     },
     "7725": {
       "name": "Bay12 Sierra",
@@ -59,7 +64,8 @@
       "format": "uri",
       "queued": false,
       "desc": "атмосферное и более требовательное РП, билд Infinity",
-      "extra": "(ИКН Сьерра)"
+      "extra": "(ИКН Сьерра)",
+      "connection_address": "play.ss220.space"
     },
     "7726": {
       "name": "Paradise Secondary",
@@ -69,7 +75,8 @@
       "format": "json",
       "queued": true,
       "desc": "Второй сервер, копия основного для равномерного распределения онлайна",
-      "extra": "(НСН Керберос) <b style='color: #2ecc71'>(новый)</b>"
+      "extra": "(НСН Керберос) <b style='color: #2ecc71'>(новый)</b>",
+      "connection_address": "game.ss220.space"
     }
   }
 }

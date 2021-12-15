@@ -54,6 +54,10 @@ export class PlayerListService {
     return Object.values(await this.getPlayerList(server_port)).filter((player) => player.new).length
   }
 
+  async isPlayerInList(server_port: string, ckey: string): Promise<boolean> {
+    return Object.keys(await this.getPlayerList(server_port)).includes(ckey)
+  }
+
   private async onPlayerRemoved(server_port: string, ckey: string): Promise<void> {
     await this.passService.removeCKeyPass(ckey, parseInt(server_port))
   }

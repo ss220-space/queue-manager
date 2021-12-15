@@ -5,6 +5,8 @@ import IORedis from "ioredis";
 import { PlayerListService } from "../playerList/playerList.service";
 import { WebhooksService } from "../webhooks/webhooks.service";
 import { servers } from "@/queue.config.json";
+import { NonQueued, QueuePassed, QueueStatusDto } from "./dto/queueStatus.dto";
+import assert from "assert";
 
 @Injectable()
 export class QueueService {
@@ -42,6 +44,24 @@ export class QueueService {
     }
     await this.redis.lrem(`byond_queue_${server_port}`, 0, JSON.stringify(entry))
     return true
+  }
+
+  async queueStatus(server_port: string, ckey: string): Promise<QueueStatusDto> {
+    const ckeyEntry = JSON.stringify({ ckey })
+    if (!await this.redis.sismember(`byond_queue_${server_port}_set`, ckeyEntry)) {
+      if (await this.playerListService.isPlayerInList(server_port, ckey)) {
+        const res = new QueuePassed()
+        const serverInfo = servers[server_port]
+        res.connection_url = `byond://${serverInfo.connection_address}:${serverInfo.port}`
+        return res
+      } else {
+        return new NonQueued()
+      }
+    }
+    const pos = await this.redis.lpos(`byond_queue_${server_port}`, ckeyEntry)
+    assert(pos)
+    const total = await this.redis.llen(`byond_queue_${server_port}`)
+    return { position: pos, total }
   }
 
   @Interval(1000)
