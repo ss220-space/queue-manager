@@ -1,0 +1,2 @@
+#define BACKEND_URL "http://localhost:3000"
+#define FRONTEND_URL "http://localhost:3000"

@@ -1,0 +1,6 @@
+*.dmb
+*.so
+*.dll
+*.log
+
+config.dm
