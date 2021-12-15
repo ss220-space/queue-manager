@@ -6,7 +6,7 @@ import {
   WsResponse,
 } from '@nestjs/websockets';
 import { Server } from 'ws';
-import { Logger } from '@nestjs/common';
+import { forwardRef, Inject, Logger } from '@nestjs/common';
 import { concat, filter, from, map, Observable } from 'rxjs';
 import { EventsService } from "./events.service";
 import { PassService } from "../pass/pass.service";
@@ -30,7 +30,9 @@ export class IptablesEventMessageDto {
 @WebSocketGateway(8080)
 export class EventsGateway {
   constructor(
+    @Inject(forwardRef(() => PassService))
     private readonly passService: PassService,
+    @Inject(forwardRef(() => EventsService))
     private readonly eventService: EventsService
   ) { }
 

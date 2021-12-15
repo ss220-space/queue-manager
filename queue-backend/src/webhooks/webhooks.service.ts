@@ -15,4 +15,8 @@ export class WebhooksService {
     await this.redis.set(`byond_status_${server_port}`, JSON.stringify(body))
     return true
   }
+
+  async getStatus(server_port: string): Promise<StatusDto> {
+    return JSON.parse(await this.redis.get(`byond_status_${server_port}`))
+  }
 }
