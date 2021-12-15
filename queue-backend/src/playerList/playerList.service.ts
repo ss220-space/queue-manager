@@ -47,7 +47,7 @@ export class PlayerListService {
 
   async getPlayerList(server_port: string): Promise<PlayerListDto> {
     const playerListStr = await this.redis.get(`byond_${server_port}_playerlist`)
-    return playerListStr ? JSON.parse(playerListStr) : null
+    return playerListStr ? JSON.parse(playerListStr) : {}
   }
 
   async getNewPlayerCount(server_port: string): Promise<number> {
@@ -97,7 +97,6 @@ export class PlayerListService {
               continue
             } else {
               newEntries[ckey] = lastPlayerlist[ckey]
-              newEntries[ckey].new = false
             }
             continue
           }
