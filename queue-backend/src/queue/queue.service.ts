@@ -20,9 +20,9 @@ export class QueueService {
 
   private readonly logger = new Logger(QueueService.name);
 
-  async addToQueue(server_port: string, ip: string): Promise<boolean> {
+  async addToQueue(server_port: string, ckey: string): Promise<boolean> {
     const newEntry = {
-      ip
+      ckey
     }
 
     if (!await this.redis.sadd(`byond_queue_${server_port}_set`, JSON.stringify(newEntry))) {
@@ -32,9 +32,9 @@ export class QueueService {
     return true
   }
 
-  async removeFromQueue(server_port: string, ip: string): Promise<boolean> {
+  async removeFromQueue(server_port: string, ckey: string): Promise<boolean> {
     const entry = {
-      ip
+      ckey
     }
 
     if (!await this.redis.srem(`byond_queue_${server_port}_set`, JSON.stringify(entry))) {
@@ -61,7 +61,8 @@ export class QueueService {
 
     if (status.occupied_slots + reservedSlots >= status.max_slots) return
     const newPlayer = await this.redis.lpop(`byond_queue_${serverPort}`)
+    await this.redis.srem(`byond_queue_${serverPort}_set`, newPlayer)
     this.logger.log(`User ${newPlayer} got pass to ${serverPort}`)
-    await this.playerListService.addFromQueue(serverPort, newPlayer)
+    await this.playerListService.addFromQueue(serverPort, JSON.parse(newPlayer).ckey)
   }
 }
