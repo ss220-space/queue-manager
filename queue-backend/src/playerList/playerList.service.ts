@@ -83,11 +83,12 @@ export class PlayerListService {
       this.logger.debug('lastPlayerlist')
       this.logger.debug(lastPlayerlist)
 
-      const ckeyList = Object.keys(lastPlayerlist).length > 0 ? Object.keys(lastPlayerlist) : fetchedPlayerlist
+      const keyList = Object.keys(lastPlayerlist).length > 0 ? Object.keys(lastPlayerlist) : fetchedPlayerlist
       const newEntries = {}
 
-      if (ckeyList) {
-        for (const ckey of ckeyList) {
+      if (keyList) {
+        for (const key of keyList) {
+          const ckey = this.ckeySanitize(key)
           this.logger.debug(`Next player is ${ckey}`)
           if (!fetchedPlayerlist?.includes(ckey)) {
             const fiveMinutesAgo = Date.now() - this.configService.get<number>('queue.ghost_away_threshold')
@@ -113,5 +114,10 @@ export class PlayerListService {
       await this.savePlayerList(<string>server_port, newEntries)
 
     }
+
   }
+
+  ckeySanitize(key: string): string {
+    return key.toLowerCase().replace(/[-_.\s]+/g, '').trim();
+  };
 }
