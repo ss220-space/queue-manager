@@ -59,7 +59,6 @@ export class QueueService {
       }
     }
     const pos = await this.redis.lpos(`byond_queue_${server_port}`, ckeyEntry)
-    assert(pos)
     const total = await this.redis.llen(`byond_queue_${server_port}`)
     return { position: pos, total }
   }
