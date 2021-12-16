@@ -55,7 +55,8 @@ export class PlayerListService {
   }
 
   async isPlayerInList(server_port: string, ckey: string): Promise<boolean> {
-    return Object.keys(await this.getPlayerList(server_port)).includes(ckey)
+    const playerlist = await this.getPlayerList(server_port)
+    return Object.keys(playerlist).includes(ckey)
   }
 
   private async onPlayerRemoved(server_port: string, ckey: string): Promise<void> {
