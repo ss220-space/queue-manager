@@ -2,15 +2,15 @@
   "name": "queue-master",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "PORT=3001 next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "PORT=3001 next start",
     "lint": "next lint"
   },
   "dependencies": {
-    "ioredis": "^4.28.2",
     "next": "12.0.7",
     "react": "17.0.2",
+    "react-cookie": "^4.1.1",
     "react-dom": "17.0.2"
   },
   "devDependencies": {
