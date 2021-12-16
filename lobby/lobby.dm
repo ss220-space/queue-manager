@@ -37,7 +37,6 @@ var/global/datum/http_system/SShttp
 
     src << browse({"
         <script>
-            document.cookie = "token=[response.body]"
-            window.location.href = "[FRONTEND_URL]"
+            window.location.href = "[FRONTEND_URL]#token=[response.body]"
         </script>
     "})
