@@ -12,6 +12,7 @@ use serde_json::{json, Value};
 use simplelog::{ColorChoice, Config, TerminalMode, TermLogger};
 use tokio_tungstenite::tungstenite::{Message, Result};
 use futures_util::{SinkExt, StreamExt};
+use tokio::select;
 use crate::fwmanage::FwChain;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -51,7 +52,16 @@ async fn main() {
     let config: DConfig = config_s.try_into().unwrap();
     log::info!("Started with config: {:?}", config);
 
-    process(config).await.unwrap();
+    let mut state: FwState = Default::default();
+
+    select! {
+        res = process(&mut state, config) => {
+           res.unwrap()
+        }
+        _ = tokio::signal::ctrl_c() => {
+            log::info!("Shutdown")
+        }
+    }
 }
 
 struct FwState {
@@ -93,10 +103,8 @@ impl Drop for FwState {
     }
 }
 
-async fn process(config: DConfig) -> Result<()> {
+async fn process(state: &mut FwState, config: DConfig) -> Result<()> {
     let (mut stream, _) = connect_async(Uri::try_from(config.master_uri.as_str()).unwrap()).await.unwrap();
-
-    let mut state: FwState = Default::default();
 
     let message = json!({
         "event": "iptables",
