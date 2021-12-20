@@ -1,4 +1,4 @@
 master_uri: "ws://localhost:8080"
 allow_ports:
-  - 7721
-redirect_port: 7750
+  - 7720
+redirect_port: 7730
