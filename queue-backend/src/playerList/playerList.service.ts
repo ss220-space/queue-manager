@@ -80,9 +80,13 @@ export class PlayerListService {
         return
       }
 
-      const fetchedPlayerlist: string[] = await playerlist;
+      let fetchedPlayerlist: string[] = await playerlist;
       this.logger.debug('fetchedPlayerlist')
       this.logger.debug(fetchedPlayerlist)
+
+      fetchedPlayerlist = fetchedPlayerlist.map(key => {
+        return this.ckeySanitize(key)
+      })
 
       const lastPlayerlist = await this.getPlayerList(<string>server_port)
       this.logger.debug('lastPlayerlist')
