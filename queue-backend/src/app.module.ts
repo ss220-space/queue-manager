@@ -8,14 +8,17 @@ import { WebhooksModule } from './webhooks/webhooks.module';
 import { ByondModule } from './byond/byond.module';
 import configuration from './config/configuration';
 import { RequestLoggingMiddleware } from "./common/middleware/requestLogging.middleware";
+import { ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       load: [configuration],
     }),
-    RedisModule.register({
-      url: process.env.REDIS_URL || 'redis://127.0.0.1:6379'
+    RedisModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => configService.get('redis.url'),         // or use async method
+      inject: [ConfigService]
     }),
     ByondModule,
     WebhooksModule,

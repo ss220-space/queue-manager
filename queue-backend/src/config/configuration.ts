@@ -1,3 +1,5 @@
+import { randomBytes } from 'crypto';
+
 export default () => ({
   port: parseInt(process.env.PORT, 10) || 3000,
   redis: {
@@ -5,5 +7,8 @@ export default () => ({
   },
   queue: {
     ghost_away_threshold: process.env.GHOST_AWAY_THRESHOLD || 300000, // 1000 * 60 * 5 = 5 Minutes
+  },
+  jwt: {
+    secret: process.env.JWT_KEY || randomBytes(256).toString('base64'), // Fallback secret for dev environment
   }
 });

@@ -11,7 +11,10 @@ import { JwtStrategy } from "./jwt.strategy";
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_KEY'),
+        secret: configService.get<string>('jwt.secret'),
+        signOptions: {
+          algorithm: 'HS512'
+        }
       }),
       inject: [ConfigService],
     })
@@ -19,4 +22,4 @@ import { JwtStrategy } from "./jwt.strategy";
   providers: [UserAuthService, JwtStrategy],
   exports: [UserAuthService]
 })
-export class UserAuthModule {}
+export class UserAuthModule { }
