@@ -1,12 +1,11 @@
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { RedisService } from 'nestjs-redis';
-import { Interval } from "@nestjs/schedule";
-import IORedis from "ioredis";
-import { PlayerListService } from "../playerList/playerList.service";
-import { WebhooksService } from "../webhooks/webhooks.service";
-import { servers } from "@/queue.config.json";
-import { NonQueued, QueuePassed, QueueStatusDto } from "./dto/queueStatus.dto";
-import assert from "assert";
+import { Interval } from '@nestjs/schedule';
+import IORedis from 'ioredis';
+import { PlayerListService } from '../playerList/playerList.service';
+import { WebhooksService } from '../webhooks/webhooks.service';
+import { servers } from '@/queue.config.json';
+import { NonQueued, QueuePassed, QueueStatusDto } from './dto/queueStatus.dto';
 
 @Injectable()
 export class QueueService {

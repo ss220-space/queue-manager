@@ -6,7 +6,9 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "target": "es2017",
+    "forceConsistentCasingInFileNames": true,
+    "target": "esnext",
+    "lib": ["dom", "dom.iterable", "esnext"],
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
@@ -16,8 +18,11 @@
     },
     "incremental": true,
     "skipLibCheck": true,
+    "moduleResolution": "node",
     "resolveJsonModule": true,
-    "esModuleInterop": true
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "strict": false,
   },
   "include": ["src/**/*"]
 }

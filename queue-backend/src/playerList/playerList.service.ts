@@ -1,11 +1,11 @@
-import { Injectable, Logger } from "@nestjs/common";
-import { RedisService } from "nestjs-redis";
-import IORedis from "ioredis";
-import { Interval } from "@nestjs/schedule";
-import { servers } from "@/queue.config.json";
-import { ByondService } from "../byond/byond.service";
-import { ConfigService } from "@nestjs/config";
-import { PassService } from "../pass/pass.service";
+import { Injectable, Logger } from '@nestjs/common';
+import { RedisService } from 'nestjs-redis';
+import IORedis from 'ioredis';
+import { Interval } from '@nestjs/schedule';
+import { servers } from '@/queue.config.json';
+import { ByondService } from '../byond/byond.service';
+import { ConfigService } from '@nestjs/config';
+import { PassService } from '../pass/pass.service';
 
 export class PlayerInfoDto {
   time: number

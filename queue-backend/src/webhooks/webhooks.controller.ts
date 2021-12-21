@@ -3,7 +3,7 @@ import { ServerPortDto } from '../common/dto/serverPort.dto';
 import { StatusDto } from './dto/status.dto';
 import { WebhooksService } from './webhooks.service';
 import { AuthorizeDto } from './dto/authorize.dto';
-import { UserAuthService } from "../userAuth/userAuth.service";
+import { UserAuthService } from '../userAuth/userAuth.service';
 
 @Controller('api/webhooks')
 export class WebhooksController {
@@ -18,7 +18,7 @@ export class WebhooksController {
     if (! await this.webhookService.pushStatus(server_port, body)) {
       throw new HttpException(`Something gone wild with ${server_port}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    return "success"
+    return 'success'
   }
 
   @Post('authorize')
