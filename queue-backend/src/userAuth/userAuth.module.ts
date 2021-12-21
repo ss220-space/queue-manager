@@ -13,13 +13,13 @@ import { JwtStrategy } from './jwt.strategy';
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('jwt.secret'),
         signOptions: {
-          algorithm: 'HS512'
-        }
+          algorithm: 'HS512',
+        },
       }),
       inject: [ConfigService],
-    })
+    }),
   ],
   providers: [UserAuthService, JwtStrategy],
-  exports: [UserAuthService]
+  exports: [UserAuthService],
 })
 export class UserAuthModule { }

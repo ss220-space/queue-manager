@@ -1,15 +1,15 @@
-import { Injectable } from "@nestjs/common";
-import { RedisService } from "nestjs-redis";
-import { EventsService } from "../events/events.service";
-import { Redis } from "ioredis";
-import { IpLinkService } from "../ipLink/ipLink.service";
+import { Injectable } from '@nestjs/common';
+import { RedisService } from 'nestjs-redis';
+import { EventsService } from '../events/events.service';
+import { Redis } from 'ioredis';
+import { IpLinkService } from '../ipLink/ipLink.service';
 
 @Injectable()
 export class PassService {
   constructor(
     private readonly redisService: RedisService,
     private readonly eventsService: EventsService,
-    private readonly ipLinkService: IpLinkService
+    private readonly ipLinkService: IpLinkService,
   ) {
     this.redis = this.redisService.getClient()
   }

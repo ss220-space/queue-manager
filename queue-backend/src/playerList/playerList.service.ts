@@ -22,7 +22,7 @@ export class PlayerListService {
     private readonly redisService: RedisService,
     private readonly byondService: ByondService,
     private readonly configService: ConfigService,
-    private readonly passService: PassService
+    private readonly passService: PassService,
   ) {
     this.redis = redisService.getClient()
 
@@ -34,7 +34,7 @@ export class PlayerListService {
     const playerList = await this.getPlayerList(server_port)
     playerList[ckey] = {
       new: true,
-      time: Date.now()
+      time: Date.now(),
     }
     await this.savePlayerList(server_port, playerList)
     await this.passService.addCKeyPass(ckey, parseInt(server_port))
@@ -111,7 +111,7 @@ export class PlayerListService {
           }
 
           newEntries[ckey] = {
-            time: Date.now()
+            time: Date.now(),
           }
         }
       }

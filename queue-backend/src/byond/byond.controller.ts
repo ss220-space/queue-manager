@@ -1,4 +1,4 @@
-import { Controller, HttpStatus, HttpException, Get, Param, } from '@nestjs/common'
+import { Controller, HttpStatus, HttpException, Get, Param } from '@nestjs/common'
 import { ByondService } from './byond.service'
 import { ServerPortDto } from '../common/dto/serverPort.dto'
 

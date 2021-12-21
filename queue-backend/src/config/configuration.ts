@@ -10,5 +10,5 @@ export default () => ({
   },
   jwt: {
     secret: process.env.JWT_KEY || randomBytes(256).toString('base64'), // Fallback secret for dev environment
-  }
+  },
 });

@@ -1,7 +1,7 @@
-module.exports = {
+export default () => ({
   parser: '@typescript-eslint/parser',
   parserOptions: {
-    project: 'tsconfig.json',
+    project: ['tsconfig.json'],
     sourceType: 'module'
   },
   plugins: ['@typescript-eslint/eslint-plugin'],
@@ -21,5 +21,6 @@ module.exports = {
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     'quotes': ['error', 'single'],
+    'comma-dangle': ['error', 'always-multiline'],
   }
-}
+})

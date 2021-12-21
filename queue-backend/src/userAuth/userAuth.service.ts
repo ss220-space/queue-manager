@@ -1,9 +1,9 @@
-import { Injectable } from "@nestjs/common";
-import { JwtService } from "@nestjs/jwt";
+import { Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 
 export class UserTokenDto {
   sub: string
-  scope: "user-auth"
+  scope: 'user-auth'
 }
 
 @Injectable()
@@ -12,7 +12,7 @@ export class UserAuthService {
   }
 
   generateUserToken(key: string): string {
-    return this.jwtService.sign({ sub: key, scope: "user-auth" }, { expiresIn: '12h' })
+    return this.jwtService.sign({ sub: key, scope: 'user-auth' }, { expiresIn: '12h' })
   }
 
   verifyUserToken(token: string): UserTokenDto {

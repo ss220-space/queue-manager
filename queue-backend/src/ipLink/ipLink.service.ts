@@ -1,6 +1,6 @@
-import { Injectable } from "@nestjs/common";
-import { RedisService } from "nestjs-redis";
-import IORedis from "ioredis";
+import { Injectable } from '@nestjs/common';
+import { RedisService } from 'nestjs-redis';
+import IORedis from 'ioredis';
 
 @Injectable()
 export class IpLinkService {

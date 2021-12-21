@@ -7,7 +7,7 @@ import { UserAuthModule } from '../userAuth/userAuth.module';
   imports: [UserAuthModule],
   controllers: [WebhooksController],
   providers: [WebhooksService],
-  exports: [WebhooksService]
+  exports: [WebhooksService],
 })
 export class WebhooksModule {
 

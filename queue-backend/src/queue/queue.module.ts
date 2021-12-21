@@ -4,9 +4,9 @@ import { QueueService } from './queue.service';
 import { RedisModule } from 'nestjs-redis'
 import { EventsModule } from '../events/events.module';
 import { ByondModule } from '../byond/byond.module';
-import { IpLinkModule } from "@/src/ipLink/ipLink.module";
-import { PlayerListModule } from "../playerList/playerList.module";
-import { WebhooksModule } from "../webhooks/webhooks.module";
+import { IpLinkModule } from '@/src/ipLink/ipLink.module';
+import { PlayerListModule } from '../playerList/playerList.module';
+import { WebhooksModule } from '../webhooks/webhooks.module';
 
 @Module({
   imports: [
@@ -15,7 +15,7 @@ import { WebhooksModule } from "../webhooks/webhooks.module";
     ByondModule,
     IpLinkModule,
     PlayerListModule,
-    forwardRef(() => WebhooksModule)
+    forwardRef(() => WebhooksModule),
   ],
   controllers: [QueueController],
   providers: [QueueService],

@@ -14,7 +14,7 @@ export class QueueService {
     private readonly redisService: RedisService,
     private readonly playerListService: PlayerListService,
     @Inject(forwardRef(() => WebhooksService))
-    private readonly webhooksService: WebhooksService
+    private readonly webhooksService: WebhooksService,
   ) {
     this.redis = this.redisService.getClient()
   }
@@ -23,7 +23,7 @@ export class QueueService {
 
   async addToQueue(server_port: string, ckey: string): Promise<boolean> {
     const newEntry = {
-      ckey
+      ckey,
     }
 
     if (!await this.redis.sadd(`byond_queue_${server_port}_set`, JSON.stringify(newEntry))) {
@@ -35,7 +35,7 @@ export class QueueService {
 
   async removeFromQueue(server_port: string, ckey: string): Promise<boolean> {
     const entry = {
-      ckey
+      ckey,
     }
 
     if (!await this.redis.srem(`byond_queue_${server_port}_set`, JSON.stringify(entry))) {

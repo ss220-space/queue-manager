@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { Observable, Subscriber } from "rxjs";
-import { IptablesEventMessageDto } from "./events.gateway";
+import { Observable, Subscriber } from 'rxjs';
+import { IptablesEventMessageDto } from './events.gateway';
 
 @Injectable()
 export class EventsService {
@@ -16,7 +16,7 @@ export class EventsService {
 
   onAddedPass(playerIp: string, targetPort: number): void {
     const message = new IptablesEventMessageDto()
-    message.action = "ALLOW"
+    message.action = 'ALLOW'
     message.inbound_address = playerIp
     message.target_port = targetPort
     this.subscriber.next(message)
@@ -24,7 +24,7 @@ export class EventsService {
 
   onRemovedPass(playerIp: string, targetPort: number): void {
     const message = new IptablesEventMessageDto()
-    message.action = "REVOKE"
+    message.action = 'REVOKE'
     message.inbound_address = playerIp
     message.target_port = targetPort
     this.subscriber.next(message)
