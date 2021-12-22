@@ -1,4 +1,4 @@
-export default () => ({
+module.exports = {
   parser: '@typescript-eslint/parser',
   parserOptions: {
     project: ['tsconfig.json'],
@@ -23,4 +23,4 @@ export default () => ({
     'quotes': ['error', 'single'],
     'comma-dangle': ['error', 'always-multiline'],
   }
-})
+}
