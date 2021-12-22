@@ -3,13 +3,13 @@ import { ServerPortDto } from '../common/dto/serverPort.dto';
 import { StatusDto } from './dto/status.dto';
 import { WebhooksService } from './webhooks.service';
 import { AuthorizeDto } from './dto/authorize.dto';
-import { UserAuthService } from '../userAuth/userAuth.service';
+import { AuthService } from '../auth/auth.service';
 
 @Controller('api/webhooks')
 export class WebhooksController {
   constructor(
     private readonly webhookService: WebhooksService,
-    private readonly userAuthService: UserAuthService,
+    private readonly authService: AuthService,
   ) { }
 
   @Post('status/:server_port')
@@ -23,6 +23,6 @@ export class WebhooksController {
 
   @Post('authorize')
   async authorizeUser(@Body() body: AuthorizeDto): Promise<string> {
-    return this.userAuthService.generateUserToken(body.ckey)
+    return this.authService.generateUserToken(body.ckey)
   }
 }

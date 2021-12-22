@@ -8,6 +8,9 @@ import { ByondModule } from './byond/byond.module';
 import configuration from './config/configuration';
 import { RequestLoggingMiddleware } from './common/middleware/requestLogging.middleware';
 import { ConfigService } from '@nestjs/config';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
+import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
   imports: [
@@ -19,10 +22,13 @@ import { ConfigService } from '@nestjs/config';
       useFactory: (configService: ConfigService) => configService.get('redis.url'),         // or use async method
       inject: [ConfigService],
     }),
+    AuthModule,
     ByondModule,
     WebhooksModule,
     ScheduleModule.forRoot(),
     QueueModule,
+    UsersModule,
+    PrismaModule,
   ],
 })
 

@@ -1,9 +1,8 @@
 import { Module } from '@nestjs/common';
-import { UserAuthService } from './userAuth.service';
+import { AuthService } from './auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { JwtStrategy } from './jwt.strategy';
-
+import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
   imports: [
@@ -13,13 +12,17 @@ import { JwtStrategy } from './jwt.strategy';
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('jwt.secret'),
         signOptions: {
+          expiresIn: '12h',
           algorithm: 'HS512',
+        },
+        verifyOptions: {
+          ignoreExpiration: false,
         },
       }),
       inject: [ConfigService],
     }),
   ],
-  providers: [UserAuthService, JwtStrategy],
-  exports: [UserAuthService],
+  providers: [AuthService, JwtStrategy],
+  exports: [AuthService],
 })
-export class UserAuthModule { }
+export class AuthModule { }
