@@ -1,11 +1,12 @@
 import { Controller, Ip, Post, Body, HttpStatus, HttpException, UseGuards, Request, Get, Param } from '@nestjs/common';
 import { QueueService } from './queue.service';
 import { QueueRequestDto } from './dto/queueRequest.dto';
-import { AuthGuard } from '@nestjs/passport';
 import { IpLinkService } from '../ipLink/ipLink.service';
 import { RequestUserDto } from '../common/dto/requestUser.dto';
 import { QueueStatusDto } from './dto/queueStatus.dto';
 import { ServerPortDto } from '../common/dto/serverPort.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+
 
 @Controller('/api/queue')
 export class QueueController {
@@ -14,7 +15,7 @@ export class QueueController {
     private readonly ipLinkService: IpLinkService,
   ) { }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @Post('add')
   async addToQueue(@Body() { server_port }: QueueRequestDto, @Ip() ip: string, @Request() { user: { ckey } }: RequestUserDto): Promise<string> {
     await this.ipLinkService.linkIp(ckey, ip)
@@ -24,7 +25,7 @@ export class QueueController {
     return 'success'
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @Post('remove')
   async removeFromQueue(@Body() { server_port }: QueueRequestDto, @Ip() ip: string, @Request() { user: { ckey } }: RequestUserDto): Promise<string> {
     await this.ipLinkService.linkIp(ckey, ip)
@@ -34,7 +35,7 @@ export class QueueController {
     return 'success'
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @Get('status/:server_port')
   async getQueueStatus(@Param() { server_port }: ServerPortDto, @Request() { user: { ckey } }: RequestUserDto): Promise<QueueStatusDto> {
     return await this.queueService.queueStatus(server_port, ckey)
