@@ -4,12 +4,12 @@ import fetchByond from './http2byond'
 import { servers } from '@/queue.config.json'
 import { RedisService } from 'nestjs-redis'
 import IORedis from 'ioredis';
+import { Interval } from '@nestjs/schedule'
 
 @Injectable()
 export class ByondService {
   constructor(
     private readonly redisService: RedisService,
-    private readonly byondService: ByondService,
   ) {
     this.redis = this.redisService.getClient()
   }
@@ -59,12 +59,12 @@ export class ByondService {
     }
   }
 
-  //@Interval(20000)
+  // @Interval(20000)
   async handleUpdateByondStatus(): Promise<void> {
     this.logger.debug('handleUpdateByondStatus Called (every 20 seconds)');
     Object.keys(servers)
       ?.map(server_port => {
-        return [this.byondService.getStatus(server_port), server_port]
+        return [this.getStatus(server_port), server_port]
       })
       ?.forEach(async ([status, server_port]) => {
         const fetchedStatus = await status;
