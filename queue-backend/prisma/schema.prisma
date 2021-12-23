@@ -1,0 +1,401 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model admin {
+  id    Int    @id @default(autoincrement())
+  ckey  String @db.VarChar(32)
+  rank  String @default("Administrator") @db.VarChar(32)
+  level Int    @default(0)
+  flags Int    @default(0)
+
+  @@index([ckey], map: "ckey")
+}
+
+model admin_log {
+  id        Int      @id @default(autoincrement())
+  datetime  DateTime @db.DateTime(0)
+  adminckey String   @db.VarChar(32)
+  adminip   String   @db.VarChar(18)
+  log       String   @db.MediumText
+
+  @@index([adminckey], map: "adminckey")
+}
+
+model ban {
+  id                  Int       @id @default(autoincrement())
+  bantime             DateTime  @db.DateTime(0)
+  serverip            String    @db.VarChar(32)
+  bantype             String    @db.VarChar(32)
+  reason              String    @db.MediumText
+  job                 String?   @db.VarChar(32)
+  duration            Int
+  rounds              Int?
+  expiration_time     DateTime  @db.DateTime(0)
+  ckey                String    @db.VarChar(32)
+  computerid          String    @db.VarChar(32)
+  ip                  String    @db.VarChar(32)
+  a_ckey              String    @db.VarChar(32)
+  a_computerid        String    @db.VarChar(32)
+  a_ip                String    @db.VarChar(32)
+  who                 String    @db.MediumText
+  adminwho            String    @db.MediumText
+  edits               String?   @db.MediumText
+  unbanned            Boolean?
+  unbanned_datetime   DateTime? @db.DateTime(0)
+  unbanned_ckey       String?   @db.VarChar(32)
+  unbanned_computerid String?   @db.VarChar(32)
+  unbanned_ip         String?   @db.VarChar(32)
+
+  @@index([ckey], map: "ckey")
+  @@index([computerid], map: "computerid")
+  @@index([ip], map: "ip")
+}
+
+model changelog {
+  id          Int               @id @default(autoincrement())
+  pr_number   Int
+  date_merged DateTime          @default(now()) @db.Timestamp(0)
+  author      String            @db.VarChar(32)
+  cl_type     changelog_cl_type
+  cl_entry    String            @db.Text
+}
+
+model characters {
+  id                           Int     @id @default(autoincrement())
+  ckey                         String  @db.VarChar(32)
+  slot                         Int
+  OOC_Notes                    String  @db.LongText
+  real_name                    String  @db.VarChar(45)
+  name_is_always_random        Boolean
+  gender                       String  @db.VarChar(11)
+  age                          Int     @db.SmallInt
+  species                      String  @db.VarChar(45)
+  language                     String  @db.VarChar(45)
+  hair_colour                  String  @default("#000000") @db.VarChar(7)
+  secondary_hair_colour        String  @default("#000000") @db.VarChar(7)
+  facial_hair_colour           String  @default("#000000") @db.VarChar(7)
+  secondary_facial_hair_colour String  @default("#000000") @db.VarChar(7)
+  skin_tone                    Int     @db.SmallInt
+  skin_colour                  String  @default("#000000") @db.VarChar(7)
+  marking_colours              String  @default("head=%23000000&body=%23000000&tail=%23000000") @db.VarChar(255)
+  head_accessory_colour        String  @default("#000000") @db.VarChar(7)
+  hair_style_name              String  @db.VarChar(45)
+  facial_style_name            String  @db.VarChar(45)
+  marking_styles               String  @default("head=None&body=None&tail=None") @db.VarChar(255)
+  head_accessory_style_name    String  @db.VarChar(45)
+  alt_head_name                String  @db.VarChar(45)
+  eye_colour                   String  @default("#000000") @db.VarChar(7)
+  underwear                    String  @db.LongText
+  undershirt                   String  @db.LongText
+  backbag                      String? @db.LongText
+  b_type                       String  @db.VarChar(45)
+  alternate_option             Int     @db.SmallInt
+  job_support_high             Int     @db.MediumInt
+  job_support_med              Int     @db.MediumInt
+  job_support_low              Int     @db.MediumInt
+  job_medsci_high              Int     @db.MediumInt
+  job_medsci_med               Int     @db.MediumInt
+  job_medsci_low               Int     @db.MediumInt
+  job_engsec_high              Int     @db.MediumInt
+  job_engsec_med               Int     @db.MediumInt
+  job_engsec_low               Int     @db.MediumInt
+  job_karma_high               Int     @db.MediumInt
+  job_karma_med                Int     @db.MediumInt
+  job_karma_low                Int     @db.MediumInt
+  flavor_text                  String  @db.LongText
+  med_record                   String  @db.LongText
+  sec_record                   String  @db.LongText
+  gen_record                   String  @db.LongText
+  disabilities                 Int     @db.MediumInt
+  player_alt_titles            String  @db.LongText
+  organ_data                   String  @db.LongText
+  rlimb_data                   String  @db.LongText
+  nanotrasen_relation          String  @db.VarChar(45)
+  speciesprefs                 Int
+  socks                        String  @db.LongText
+  body_accessory               String  @db.LongText
+  gear                         String  @db.LongText
+  autohiss                     Boolean
+
+  @@index([ckey], map: "ckey")
+}
+
+model ckey_whitelist {
+  id         Int       @id @default(autoincrement())
+  date       DateTime  @default(now()) @db.DateTime(0)
+  ckey       String    @db.VarChar(32)
+  adminwho   String    @db.VarChar(32)
+  port       Int       @db.UnsignedInt
+  date_start DateTime  @default(now()) @db.DateTime(0)
+  date_end   DateTime? @db.DateTime(0)
+  is_valid   Boolean   @default(true)
+}
+
+model connection_log {
+  id         Int      @id @default(autoincrement())
+  datetime   DateTime @db.DateTime(0)
+  ckey       String   @db.VarChar(32)
+  ip         String   @db.VarChar(32)
+  computerid String   @db.VarChar(32)
+
+  @@index([ckey], map: "ckey")
+  @@index([computerid], map: "computerid")
+  @@index([ip], map: "ip")
+}
+
+model customuseritems {
+  id             Int     @id @default(autoincrement())
+  cuiCKey        String  @db.VarChar(36)
+  cuiRealName    String  @db.VarChar(60)
+  cuiPath        String  @db.VarChar(255)
+  cuiItemName    String? @db.MediumText
+  cuiDescription String? @db.MediumText
+  cuiReason      String? @db.MediumText
+  cuiPropAdjust  String? @db.MediumText
+  cuiJobMask     String  @db.MediumText
+
+  @@index([cuiCKey], map: "cuiCKey")
+}
+
+model death {
+  id        Int      @id @default(autoincrement())
+  pod       String   @db.MediumText
+  coord     String   @db.MediumText
+  tod       DateTime @db.DateTime(0)
+  job       String   @db.MediumText
+  special   String   @db.MediumText
+  name      String   @db.MediumText
+  byondkey  String   @db.MediumText
+  laname    String   @db.MediumText
+  lakey     String   @db.MediumText
+  gender    String   @db.MediumText
+  bruteloss Int
+  brainloss Int
+  fireloss  Int
+  oxyloss   Int
+}
+
+model donators {
+  patreon_name String    @id @db.VarChar(32)
+  tier         Int?
+  ckey         String?   @db.VarChar(32)
+  start_date   DateTime? @db.DateTime(0)
+  end_date     DateTime? @db.DateTime(0)
+  active       Boolean?
+
+  @@index([ckey], map: "ckey")
+}
+
+model feedback {
+  id       Int               @id @default(autoincrement()) @db.UnsignedInt
+  datetime DateTime          @db.DateTime(0)
+  round_id Int
+  key_name String            @db.VarChar(32)
+  key_type feedback_key_type
+  version  Int               @db.UnsignedTinyInt
+  json     String            @db.LongText
+}
+
+model ip2group {
+  ip       String   @id @db.VarChar(18)
+  date     DateTime @default(now()) @db.Timestamp(0)
+  groupstr String   @default("") @db.VarChar(32)
+
+  @@index([groupstr], map: "groupstr")
+}
+
+model ipintel {
+  ip    Int      @id @db.UnsignedInt
+  date  DateTime @default(now()) @db.Timestamp(0)
+  intel Float    @default(0)
+}
+
+model karma {
+  id              Int      @id @default(autoincrement())
+  spendername     String   @db.MediumText
+  spenderkey      String   @db.MediumText
+  receivername    String   @db.MediumText
+  receiverkey     String   @db.MediumText
+  receiverrole    String?  @db.MediumText
+  receiverspecial String?  @db.MediumText
+  isnegative      Boolean?
+  spenderip       String   @db.MediumText
+  time            DateTime @db.DateTime(0)
+}
+
+model karmatotals {
+  id         Int    @id @default(autoincrement())
+  byondkey   String @default("") @db.VarChar(32)
+  karma      Int
+  karmaspent Int    @default(0)
+
+  @@index([byondkey], map: "byondkey")
+}
+
+model legacy_population {
+  id          Int      @id @default(autoincrement())
+  playercount Int?
+  admincount  Int?
+  time        DateTime @db.DateTime(0)
+}
+
+model library {
+  id       Int    @id @default(autoincrement())
+  author   String @db.MediumText
+  title    String @db.MediumText
+  content  String @db.MediumText
+  category String @db.MediumText
+  ckey     String @db.VarChar(32)
+  flagged  Int
+
+  @@index([ckey], map: "ckey")
+  @@index([flagged], map: "flagged")
+}
+
+model memo {
+  ckey        String   @id @db.VarChar(32)
+  memotext    String   @db.MediumText
+  timestamp   DateTime @db.DateTime(0)
+  last_editor String?  @db.VarChar(32)
+  edits       String?  @db.MediumText
+}
+
+model notes {
+  id            Int      @id @default(autoincrement())
+  ckey          String   @db.VarChar(32)
+  notetext      String   @db.MediumText
+  timestamp     DateTime @db.DateTime(0)
+  adminckey     String   @db.VarChar(32)
+  last_editor   String?  @db.VarChar(32)
+  edits         String?  @db.MediumText
+  server        String   @db.VarChar(50)
+  crew_playtime Int?     @default(0) @db.UnsignedMediumInt
+
+  @@index([ckey], map: "ckey")
+}
+
+model oauth_tokens {
+  ckey  String @db.VarChar(32)
+  token String @id @db.VarChar(32)
+
+  @@index([ckey], map: "ckey")
+}
+
+model player {
+  id             Int       @id @default(autoincrement())
+  ckey           String    @unique(map: "ckey") @db.VarChar(32)
+  firstseen      DateTime  @db.DateTime(0)
+  lastseen       DateTime  @db.DateTime(0)
+  ip             String    @db.VarChar(18)
+  computerid     String    @db.VarChar(32)
+  lastadminrank  String    @default("Player") @db.VarChar(32)
+  ooccolor       String?   @default("#b82e00") @db.VarChar(7)
+  UI_style       String?   @default("Midnight") @db.VarChar(10)
+  UI_style_color String?   @default("#ffffff") @db.VarChar(7)
+  UI_style_alpha Int?      @default(255) @db.SmallInt
+  be_role        String?   @db.LongText
+  default_slot   Int?      @default(1) @db.SmallInt
+  toggles        Int?
+  toggles_2      Int?      @default(0)
+  sound          Int?      @default(31) @db.MediumInt
+  volume         Int?      @default(100) @db.SmallInt
+  lastchangelog  String    @default("0") @db.VarChar(32)
+  exp            String?   @db.LongText
+  clientfps      Int?      @default(0) @db.SmallInt
+  atklog         Int?      @default(0) @db.SmallInt
+  fuid           BigInt?
+  fupdate        Int?      @default(0) @db.SmallInt
+  parallax       Int?      @default(8) @db.TinyInt
+  byond_date     DateTime? @db.Date
+  discord_id     String?   @db.VarChar(32)
+  discord_name   String?   @db.VarChar(32)
+
+  @@index([computerid], map: "computerid")
+  @@index([fuid], map: "fuid")
+  @@index([fupdate], map: "fupdate")
+  @@index([ip], map: "ip")
+  @@index([lastseen], map: "lastseen")
+}
+
+model playtime_history {
+  ckey        String   @db.VarChar(32)
+  date        DateTime @db.Date
+  time_living Int      @db.SmallInt
+  time_ghost  Int      @db.SmallInt
+
+  @@id([ckey, date])
+}
+
+model privacy {
+  ckey     String   @id @db.VarChar(32)
+  datetime DateTime @db.DateTime(0)
+  consent  Boolean  @db.Bit(1)
+}
+
+model round {
+  id                  Int       @id @default(autoincrement())
+  initialize_datetime DateTime  @db.DateTime(0)
+  start_datetime      DateTime? @db.DateTime(0)
+  shutdown_datetime   DateTime? @db.DateTime(0)
+  end_datetime        DateTime? @db.DateTime(0)
+  server_ip           Int       @db.UnsignedInt
+  server_port         Int       @db.UnsignedSmallInt
+  commit_hash         String?   @db.Char(40)
+  game_mode           String?   @db.VarChar(32)
+  game_mode_result    String?   @db.VarChar(64)
+  end_state           String?   @db.VarChar(64)
+  shuttle_name        String?   @db.VarChar(64)
+  map_name            String?   @db.VarChar(32)
+  station_name        String?   @db.VarChar(80)
+}
+
+model vpn_whitelist {
+  ckey   String  @id @db.VarChar(32)
+  reason String? @db.MediumText
+}
+
+model watch {
+  ckey        String   @id @db.VarChar(32)
+  reason      String   @db.MediumText
+  timestamp   DateTime @db.DateTime(0)
+  adminckey   String   @db.VarChar(32)
+  last_editor String?  @db.VarChar(32)
+  edits       String?  @db.MediumText
+}
+
+model whitelist {
+  id      Int     @id @default(autoincrement())
+  ckey    String  @db.VarChar(32)
+  job     String? @db.MediumText
+  species String? @db.MediumText
+
+  @@index([ckey], map: "ckey")
+}
+
+enum changelog_cl_type {
+  FIX
+  WIP
+  TWEAK
+  SOUNDADD
+  SOUNDDEL
+  CODEADD
+  CODEDEL
+  IMAGEADD
+  IMAGEDEL
+  SPELLCHECK
+  EXPERIMENT
+}
+
+enum feedback_key_type {
+  text
+  amount
+  tally
+  nested_tally @map("nested tally")
+  associative
+}
