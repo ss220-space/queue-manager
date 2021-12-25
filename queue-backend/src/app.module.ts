@@ -22,13 +22,13 @@ import { PrismaModule } from './prisma/prisma.module';
       useFactory: (configService: ConfigService) => configService.get('redis.url'),         // or use async method
       inject: [ConfigService],
     }),
+    PrismaModule,
+    ScheduleModule.forRoot(),
     AuthModule,
     ByondModule,
     WebhooksModule,
-    ScheduleModule.forRoot(),
     QueueModule,
     UsersModule,
-    PrismaModule,
   ],
 })
 
