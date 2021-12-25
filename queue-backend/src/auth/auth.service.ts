@@ -1,20 +1,33 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService, JwtSignOptions, JwtVerifyOptions } from '@nestjs/jwt';
-
-export class JwtPayloadDto {
-  sub: string
-}
+import { UsersService } from '../users/users.service';
+import { JwtPayloadDto } from './dto/jwtPayload.dto';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly jwtService: JwtService) {
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly usersService: UsersService,
+    ) {
   }
 
-  generateUserToken(key: string, signOptions: JwtSignOptions = {}): string {
-    return this.jwtService.sign({ sub: key }, signOptions)
+  async generateUserToken(ckey: string, signOptions: JwtSignOptions = {}): Promise<string> {
+    const user = await this.getProfile(ckey);
+    return this.jwtService.sign({ 
+      sub: ckey,  
+      roles: user.adminFlags, 
+    }, signOptions)
   }
 
   verifyUserToken(token: string, verifyOptions: JwtVerifyOptions = {}): JwtPayloadDto {
     return this.jwtService.verify(token, verifyOptions)
+  }
+
+  async getProfile(ckey: string) {
+    const user = await this.usersService.getUserPrivilegesByCkey(ckey)
+    return {
+      ckey,
+      adminFlags: user.adminFlags,
+    }
   }
 }

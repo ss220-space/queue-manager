@@ -1,6 +1,7 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
+import { CkeyDto } from '../common/dto/ckey.dto';
 import { AuthService } from './auth.service';
-import { AuthorizeDto } from './dto/authorize.dto';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -9,7 +10,13 @@ export class AuthController {
   ) { }
 
   @Post('authorize')
-  async authorizeUser(@Body() body: AuthorizeDto): Promise<string> {
-    return this.authService.generateUserToken(body.ckey)
+  async authorizeUser(@Body() { ckey }: CkeyDto): Promise<string> {
+    return this.authService.generateUserToken(ckey)
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('profile')
+  getProfile(@Request() req) {
+    return req.user;
   }
 }
