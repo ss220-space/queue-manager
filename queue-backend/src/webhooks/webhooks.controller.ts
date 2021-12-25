@@ -5,7 +5,7 @@ import { WebhooksService } from './webhooks.service';
 import { AuthorizeDto } from './dto/authorize.dto';
 import { AuthService } from '../auth/auth.service';
 
-@Controller('api/webhooks')
+@Controller('webhooks')
 export class WebhooksController {
   constructor(
     private readonly webhookService: WebhooksService,

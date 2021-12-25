@@ -1,4 +1,4 @@
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { WsAdapter } from '@nestjs/platform-ws';
@@ -10,6 +10,11 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const PORT = configService.get<number>('port');
 
+  app.setGlobalPrefix('api');
+  app.enableVersioning({
+    type: VersioningType.URI,
+    defaultVersion: '1',
+  });
   app.useGlobalPipes(new ValidationPipe());
   app.useWebSocketAdapter(new WsAdapter(app));
 
