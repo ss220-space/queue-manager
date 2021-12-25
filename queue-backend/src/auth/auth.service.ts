@@ -10,7 +10,7 @@ export class AuthService {
   constructor(private readonly jwtService: JwtService) {
   }
 
-  generateUserToken(key: string, signOptions: JwtSignOptions = {},): string {
+  generateUserToken(key: string, signOptions: JwtSignOptions = {}): string {
     return this.jwtService.sign({ sub: key }, signOptions)
   }
 
