@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import { Button, Card, Col, Container, Row, Stack } from 'react-bootstrap'
 import styles from '../styles/Home.module.css'
 import { Server } from '../src/ServerCard/ServerCard'
+import EventSource from 'eventsource'
 
 export type QueueStatusDto = QueuePassed | QueuePosition | NonQueued
 
@@ -89,6 +90,16 @@ function Home({ servers }: InferGetServerSidePropsType<typeof getStaticProps>) {
       joinedQueueStatus = parsed.message || "Error"
     }
   }
+
+  useEffect(() => {
+    const eventSource = new EventSource('/sse');
+    eventSource.onmessage = ({ data }) => {
+      console.log(data)
+    }
+    eventSource.onerror = (event => {
+      console.log(event)
+    })
+  }, [])
 
   return (
     <Container fluid>
