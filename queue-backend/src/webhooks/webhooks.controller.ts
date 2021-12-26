@@ -10,10 +10,10 @@ export class WebhooksController {
   ) { }
 
   @Post('status/:server_port')
-  async pushStatus(@Param() { server_port }: ServerPortDto, @Body() body: StatusDto): Promise<string> {
+  async pushStatus(@Param() { serverPort }: ServerPortDto, @Body() body: StatusDto): Promise<string> {
 
-    if (! await this.webhookService.pushStatus(server_port, body)) {
-      throw new HttpException(`Something gone wild with ${server_port}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    if (! await this.webhookService.pushStatus(serverPort, body)) {
+      throw new HttpException(`Something gone wild with ${serverPort}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
     return 'success'
   }

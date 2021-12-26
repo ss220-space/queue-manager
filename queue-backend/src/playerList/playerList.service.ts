@@ -6,6 +6,7 @@ import { servers } from '@/queue.config.json';
 import { ByondService } from '../byond/byond.service';
 import { ConfigService } from '@nestjs/config';
 import { PassService } from '../pass/pass.service';
+import { WebhooksService } from '../webhooks/webhooks.service';
 
 export class PlayerInfoDto {
   time: number
@@ -23,6 +24,7 @@ export class PlayerListService {
     private readonly byondService: ByondService,
     private readonly configService: ConfigService,
     private readonly passService: PassService,
+    private readonly webhooksService: WebhooksService,
   ) {
     this.redis = redisService.getClient()
 
@@ -30,52 +32,61 @@ export class PlayerListService {
   private readonly redis: IORedis.Redis
   private readonly logger = new Logger(PlayerListService.name);
 
-  async addFromQueue(server_port: string, ckey: string): Promise<void> {
-    const playerList = await this.getPlayerList(server_port)
+  async addFromQueue(serverPort: string, ckey: string): Promise<void> {
+    const playerList = await this.getPlayerList(serverPort)
     playerList[ckey] = {
       new: true,
       time: Date.now(),
     }
-    await this.savePlayerList(server_port, playerList)
-    await this.passService.addCKeyPass(ckey, parseInt(server_port))
+    await this.savePlayerList(serverPort, playerList)
+    await this.passService.addCKeyPass(ckey, parseInt(serverPort))
   }
 
-  private async savePlayerList(server_port: string, playerList: PlayerListDto): Promise<void> {
-    await this.redis.set(`byond_${server_port}_playerlist`, JSON.stringify(playerList))
+  private async savePlayerList(serverPort: string, playerList: PlayerListDto): Promise<void> {
+    await this.redis.set(`byond_${serverPort}_playerlist`, JSON.stringify(playerList))
   }
 
+  async getSlotStats(serverPort: string) {
+    const reservedSlots = await this.getNewPlayerCount(serverPort)
+    const status = await this.webhooksService.getStatus(serverPort)
 
-  async getPlayerList(server_port: string): Promise<PlayerListDto> {
-    const playerListStr = await this.redis.get(`byond_${server_port}_playerlist`)
+    return {
+      max: status.max_slots,
+      occupied: status.occupied_slots + reservedSlots,
+    }
+  }
+
+  async getPlayerList(serverPort: string): Promise<PlayerListDto> {
+    const playerListStr = await this.redis.get(`byond_${serverPort}_playerlist`)
     return playerListStr ? JSON.parse(playerListStr) : {}
   }
 
-  async getNewPlayerCount(server_port: string): Promise<number> {
-    return Object.values(await this.getPlayerList(server_port)).filter((player) => player.new).length
+  async getNewPlayerCount(serverPort: string): Promise<number> {
+    return Object.values(await this.getPlayerList(serverPort)).filter((player) => player.new).length
   }
 
-  async isPlayerInList(server_port: string, ckey: string): Promise<boolean> {
-    const playerlist = await this.getPlayerList(server_port)
+  async isPlayerInList(serverPort: string, ckey: string): Promise<boolean> {
+    const playerlist = await this.getPlayerList(serverPort)
     return Object.keys(playerlist).includes(ckey)
   }
 
-  private async onPlayerRemoved(server_port: string, ckey: string): Promise<void> {
-    await this.passService.removeCKeyPass(ckey, parseInt(server_port))
+  private async onPlayerRemoved(serverPort: string, ckey: string): Promise<void> {
+    await this.passService.removeCKeyPass(ckey, parseInt(serverPort))
   }
 
-  @Interval(10000)
+  // @Interval(10000)
   async handleUpdateByondPlayerlist(): Promise<void> {
     this.logger.debug('handleUpdateByondPlayerlist Called (every 10 seconds)')
     const playerLists = Object.keys(servers)
-      .filter(server_port => {
-        return servers[server_port].queued && servers[server_port].test
+      .filter(serverPort => {
+        return servers[serverPort].queued && servers[serverPort].test
       })
-      .map(server_port => {
-        this.logger.debug(`Fetching ${server_port}`)
-        return [this.byondService.getPlayerlistExt(server_port), server_port]
+      .map(serverPort => {
+        this.logger.debug(`Fetching ${serverPort}`)
+        return [this.byondService.getPlayerlistExt(serverPort), serverPort]
       })
 
-    for (const [playerlist, server_port] of playerLists) {
+    for (const [playerlist, serverPort] of playerLists) {
       if (!playerlist) {
         return
       }
@@ -88,7 +99,7 @@ export class PlayerListService {
         return this.ckeySanitize(key)
       })
 
-      const lastPlayerlist = await this.getPlayerList(<string>server_port)
+      const lastPlayerlist = await this.getPlayerList(<string>serverPort)
       this.logger.debug('lastPlayerlist')
       this.logger.debug(lastPlayerlist)
 
@@ -102,7 +113,7 @@ export class PlayerListService {
           if (!fetchedPlayerlist?.includes(ckey)) {
             const fiveMinutesAgo = Date.now() - this.configService.get<number>('queue.ghost_away_threshold')
             if (lastPlayerlist[ckey]?.time < fiveMinutesAgo) {
-              await this.onPlayerRemoved(<string>server_port, ckey)
+              await this.onPlayerRemoved(<string>serverPort, ckey)
               continue
             } else {
               newEntries[ckey] = lastPlayerlist[ckey]
@@ -119,7 +130,7 @@ export class PlayerListService {
       this.logger.debug('newEntries')
       this.logger.debug(newEntries)
 
-      await this.savePlayerList(<string>server_port, newEntries)
+      await this.savePlayerList(<string>serverPort, newEntries)
 
     }
 
