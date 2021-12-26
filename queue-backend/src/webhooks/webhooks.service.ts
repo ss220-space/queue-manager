@@ -11,12 +11,12 @@ export class WebhooksService {
     this.redis = this.redisService.getClient()
   }
 
-  async pushStatus(server_port: string, body: StatusDto): Promise<boolean> {
-    await this.redis.set(`byond_status_${server_port}`, JSON.stringify(body))
+  async pushStatus(serverPort: string, body: StatusDto): Promise<boolean> {
+    await this.redis.set(`byond_status_${serverPort}`, JSON.stringify(body))
     return true
   }
 
-  async getStatus(server_port: string): Promise<StatusDto> {
-    return JSON.parse(await this.redis.get(`byond_status_${server_port}`))
+  async getStatus(serverPort: string): Promise<StatusDto> {
+    return JSON.parse(await this.redis.get(`byond_status_${serverPort}`))
   }
 }

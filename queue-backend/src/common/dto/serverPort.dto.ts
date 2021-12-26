@@ -5,5 +5,5 @@ export class ServerPortDto {
   @IsPort()
   @IsNotEmpty()
   @Validate(ServerExistsRule)
-  'server_port': string;
+  serverPort: string;
 }

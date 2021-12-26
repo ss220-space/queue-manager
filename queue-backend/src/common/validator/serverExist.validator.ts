@@ -1,10 +1,10 @@
 import { ValidationArguments, ValidatorConstraint, ValidatorConstraintInterface } from 'class-validator';
-import queueConfig from '@/queue.config.json'
+import { servers } from '@/queue.config.json'
 
 @ValidatorConstraint({ name: 'ServerExistsRule', async: true })
 export class ServerExistsRule implements ValidatorConstraintInterface {
   async validate(value: string): Promise<boolean> {
-    return (value in queueConfig.servers)
+    return (value in servers)
   }
 
   defaultMessage(args: ValidationArguments): string {

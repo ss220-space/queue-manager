@@ -1,7 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
-import queueConfig from '@/queue.config.json'
-import fetchByond from './http2byond'
 import { servers } from '@/queue.config.json'
+import fetchByond from './http2byond'
 import { RedisService } from 'nestjs-redis'
 import IORedis from 'ioredis';
 import { Interval } from '@nestjs/schedule'
@@ -13,11 +12,11 @@ export class ByondService {
   ) {
     this.redis = this.redisService.getClient()
   }
-  private readonly logger = new Logger();
+  private readonly logger = new Logger(ByondService.name);
   private readonly redis: IORedis.Redis;
 
-  async getStatus(id: string): Promise<any> {
-    const server = queueConfig.servers[id];
+  async fetchStatus(serverPort: string): Promise<any> {
+    const server = servers[serverPort];
 
     try {
       const queryByond = await fetchByond(server)
@@ -31,14 +30,13 @@ export class ByondService {
           return null
       }
     } catch (err) {
-      console.error(`Failed to getStatus with id ${id}`);
-      console.error(err);
+      this.logger.error(`Failed to getStatus with id ${serverPort}\n${err}`);
       return null
     }
   };
 
   async getPlayerlistExt(id: string): Promise<any> {
-    const server = { ...queueConfig.servers[id] }
+    const server = { ...servers[id] }
     server.topic = '?playerlist_ext'
 
     try {
@@ -53,24 +51,27 @@ export class ByondService {
           return null
       }
     } catch (err) {
-      console.error(`Failed to getStatus with id ${id}`);
-      console.error(err);
+      this.logger.error(`Failed to getStatus with id ${id}\n${err}`);
       return null
     }
   }
 
-  // @Interval(20000)
+  @Interval(20000)
   async handleUpdateByondStatus(): Promise<void> {
     this.logger.debug('handleUpdateByondStatus Called (every 20 seconds)');
     Object.keys(servers)
-      ?.map(server_port => {
-        return [this.getStatus(server_port), server_port]
+      ?.map(serverPort => {
+        return [this.fetchStatus(serverPort), serverPort]
       })
-      ?.forEach(async ([status, server_port]) => {
+      ?.forEach(async ([status, serverPort]) => {
+        if (!status) 
+          return
         const fetchedStatus = await status;
         if (!fetchedStatus)
           return
-        await this.redis.set(`byond_${server_port}_status`, JSON.stringify(fetchedStatus))
+        await this.redis.set(`byond_${serverPort}_status`, JSON.stringify(fetchedStatus))
       })
   }
+
+  
 }
