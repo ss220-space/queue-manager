@@ -1,4 +1,9 @@
 /** @type {import('next').NextConfig} */
-module.exports = {
-  reactStrictMode: true,
-}
+const withTM = require('next-transpile-modules')(['react-bootstrap', '@restart/ui']);
+
+module.exports = withTM({
+  // webpack(config, options) {
+  //   config.optimization.minimize = false;
+  //   return config;
+  // }
+});
