@@ -7,7 +7,7 @@ import { ServerPortDto } from '../common/dto/serverPort.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 
-@Controller('/api/queue')
+@Controller('queue')
 export class QueueController {
   constructor(
     private readonly queueService: QueueService,
