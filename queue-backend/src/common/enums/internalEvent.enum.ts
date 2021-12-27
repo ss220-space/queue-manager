@@ -4,4 +4,5 @@ export enum InternalEvent {
   PassUpdate = 'PassUpdate',
   PassAdded = 'Pass.Added',
   PassRemoved = 'Pass.Removed',
+  IpChanged = 'IpChanged'
 }

@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Subject } from 'rxjs';
 import { IptablesEventMessageDto } from './iptablesEvents.gateway';
 import { IpLinkService } from '../ipLink/ipLink.service'
 import { PassService } from '../pass/pass.service'
 import { OnEvent } from '@nestjs/event-emitter'
 import { InternalEvent } from '../common/enums/internalEvent.enum'
+import { IpChangeEvent } from '../common/events/ip-change.event'
 
 @Injectable()
 export class IptablesEventsService {
@@ -16,6 +17,7 @@ export class IptablesEventsService {
   }
 
   eventsSubject: Subject<IptablesEventMessageDto>;
+  private readonly logger = new Logger(IptablesEventsService.name)
 
 
   async getIpPasses(serverPort: string): Promise<string[]> {
@@ -34,6 +36,17 @@ export class IptablesEventsService {
   async handlePassRemoved({ckey, serverPort}): Promise<void> {
     const ips = await this.ipLinkService.getIp(ckey)
     ips.forEach((ip) => this.onRemovedPass(ip, parseInt(serverPort)))
+  }
+
+  @OnEvent(InternalEvent.IpChanged, {promisify:true})
+  async handleIpChanged({ckey, newIp, oldIp}: IpChangeEvent): Promise<void> {
+    const passes = await this.passService.getPassesByCkey(ckey)
+    if (passes.length == 0) return
+    this.logger.debug(`[${ckey}] ip change ${oldIp} -> ${newIp} with active passes: ${passes}`)
+    for (const port of passes) {
+      this.onRemovedPass(oldIp, parseInt(port))
+      this.onAddedPass(newIp, parseInt(port))
+    }
   }
 
   onAddedPass(playerIp: string, targetPort: number): void {
