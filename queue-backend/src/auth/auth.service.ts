@@ -16,6 +16,7 @@ export class AuthService {
     return this.jwtService.sign({ 
       sub: ckey,  
       roles: user.adminFlags, 
+      ban: user.hasActiveBan,
     }, signOptions)
   }
 
@@ -25,9 +26,11 @@ export class AuthService {
 
   async getProfile(ckey: string) {
     const user = await this.usersService.getUserPrivilegesByCkey(ckey)
+    const ban = await this.usersService.getActiveBanByCkey(ckey)
     return {
       ckey,
       adminFlags: user.adminFlags,
+      hasActiveBan: ban ? true : false,
     }
   }
 }

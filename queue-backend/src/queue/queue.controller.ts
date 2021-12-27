@@ -5,6 +5,7 @@ import { RequestUserDto } from '../common/dto/requestUser.dto';
 import { ServerQueueStatus } from './dto/queueStatus.dto';
 import { ServerPortDto } from '../common/dto/serverPort.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { NotBannedGuard } from '../auth/guards/not-banned.guard';
 
 
 @Controller('queue')
@@ -14,7 +15,7 @@ export class QueueController {
     private readonly ipLinkService: IpLinkService,
   ) { }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, NotBannedGuard)
   @Post('add')
   async addToQueue(@Body() { serverPort }: ServerPortDto, @Ip() ip: string, @Request() { user: { ckey } }: RequestUserDto): Promise<string> {
     await this.ipLinkService.linkIp(ckey, ip)
@@ -24,7 +25,7 @@ export class QueueController {
     return 'success'
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, NotBannedGuard)
   @Post('remove')
   async removeFromQueue(@Body() { serverPort }: ServerPortDto, @Ip() ip: string, @Request() { user: { ckey } }: RequestUserDto): Promise<string> {
     await this.ipLinkService.linkIp(ckey, ip)

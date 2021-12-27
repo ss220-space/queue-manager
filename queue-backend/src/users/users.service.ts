@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import {
   admin as AdminModel,
   donators as DonatorsModel,
+  ban as BanModel,
   Prisma,
 } from '@prisma/client';
 import { AdminRank } from '../common/enums/adminRank.enum';
@@ -66,6 +67,50 @@ export class UsersService {
       adminFlags: admin?.flags,
       donatorTier: donator?.tier,
     };
+  }
+
+  async ban(banWhereInput: Prisma.banWhereInput): Promise<BanModel | null> {
+    return this.prisma.ban.findFirst({
+      where: banWhereInput,
+    })
+  }
+
+  async bans(params: {
+    skip?: number;
+    take?: number;
+    cursor?: Prisma.banWhereUniqueInput;
+    where?: Prisma.banWhereInput;
+    orderBy?: Prisma.banOrderByWithRelationInput;
+  }): Promise<BanModel[]> {
+    const { skip, take, cursor, where, orderBy } = params;
+    return this.prisma.ban.findMany({
+      skip,
+      take,
+      cursor,
+      where,
+      orderBy,
+    });
+  }
+
+  async getActiveBanByCkey(ckey: string): Promise<BanModel> {
+    return await this.ban({
+      ckey,
+      bantype: { in: ['TEMPBAN', 'PERMABAN', 'ADMIN_TEMPBAN', 'ADMIN_PERMABAN'] },
+      unbanned: null,
+      OR: [
+        {
+          duration: -1,
+        },
+        {
+          duration: {
+            gt: 0,
+          },
+          expiration_time: {
+            gt: new Date(), 
+          },
+        },
+      ],
+    })
   }
 
   private async createAdmin(data: Prisma.adminCreateInput): Promise<AdminModel> {
