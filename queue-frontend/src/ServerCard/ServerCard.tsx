@@ -22,7 +22,7 @@ export type Server = {
   desc: string;
   connection_address: string;
   port: string;
-  queued: string;
+  queued: boolean;
   status?: {
     mode: string;
     roundtime: string;
@@ -50,7 +50,7 @@ export type ServerQueue = {
 
 
 
-export default function ServerCard(server: Server, token: string, queue?: ServerQueue) {
+export default function ServerCard(server: Server, token: string, queueLoaded: boolean, queue?: ServerQueue) {
   async function handleClick() {
     if (server.queued && !queue?.hasPass) {
       const data = {
@@ -99,11 +99,9 @@ export default function ServerCard(server: Server, token: string, queue?: Server
       }
     }
     return (
-      <Button onClick={handleClick} variant="primary">Играть</Button>
+      <Button disabled={server.queued && !queueLoaded} onClick={handleClick} variant="primary">Играть</Button>
     )
   }
-
-
 
   return (
     <Card>

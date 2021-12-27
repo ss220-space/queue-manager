@@ -84,7 +84,7 @@ async function fetchQueueState(token:string): Promise<Queue> {
 function Home({ initialServers }: InferGetServerSidePropsType<typeof getStaticProps>) {
   const [token, setToken] = useState('');
   const [servers, setServers] = useState<Server[]>(initialServers)
-  const [queue, setQueue] = useState<Queue>({})
+  const [queue, setQueue] = useState<Queue>()
 
   useEffect(() => {
     setToken(window.location.hash.split('#token=').pop()!)
@@ -160,7 +160,7 @@ function Home({ initialServers }: InferGetServerSidePropsType<typeof getStaticPr
         <Row xs={1} md={2} lg={3}>
           {servers.map(server => (
             <Col className='p-3' key={server.name}>
-              { ServerCard(server, token, queue[server.port]) }
+              { ServerCard(server, token, queue != null, queue?.[server.port]) }
             </Col>
           ))}
         </Row>
