@@ -32,8 +32,6 @@ export type Server = {
       occupied: number;
     };
   }
-  
-  
 }
 
 export default function ServerCard(server: Server) {

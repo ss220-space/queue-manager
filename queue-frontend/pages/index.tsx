@@ -31,14 +31,15 @@ export async function getStaticProps() {
 
   return {
     props: {
-      servers,
+      initinalServers: servers,
     },
     revalidate: 10, // In seconds
   }
 }
 
-function Home({ servers }: InferGetServerSidePropsType<typeof getStaticProps>) {
+function Home({ initinalServers }: InferGetServerSidePropsType<typeof getStaticProps>) {
   const [token, setToken] = useState('');
+  const [servers, setServers] = useState<Server[]>(initinalServers)
   //const [queueStatus, setQueueStatus] = useState('');
 
   useEffect(() => {
@@ -92,10 +93,10 @@ function Home({ servers }: InferGetServerSidePropsType<typeof getStaticProps>) {
   }
 
   useEffect(() => {
-    const eventSource = new EventSource('/sse');
-    eventSource.onmessage = ({ data }) => {
-      console.log(data)
-    }
+    const eventSource = new EventSource('http://game.ss220.space:3000/api/v1/servers/status-events');
+    eventSource.addEventListener('StatusEvent', ({ data }) => {
+      setServers(JSON.parse(data))
+    })
     eventSource.onerror = (event => {
       console.log(event)
     })
