@@ -57,7 +57,7 @@ export default function ServerCard(server: Server, token: string, queueLoaded: b
         'serverPort': `${server.port}`
       }
       let action: string
-      if (queue != null) {
+      if (queue != null && queue.position != null) {
         action = `${backendUrl}/api/v1/queue/remove`
       } else {
         action = `${backendUrl}/api/v1/queue/add`

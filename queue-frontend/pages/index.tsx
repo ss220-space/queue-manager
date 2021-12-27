@@ -114,33 +114,41 @@ function Home({ initialServers }: InferGetServerSidePropsType<typeof getStaticPr
     })
     eventSource.addEventListener('QueueEvent', ({ data }: any) => {
       console.log(data)
-      console.log(queue)
-      const update: ServerQueueStatus = JSON.parse(data)
-      const newQueue: Queue = { ...queue }
-      for (const qs of update) {
-        newQueue[qs.serverPort] = {
-          ...qs,
-          hasPass: false
-        }
-      }
 
-      // console.log(newQueue)
-      setQueue(newQueue)
+      setQueue((queue) => {
+        const update: ServerQueueStatus = JSON.parse(data)
+        const newQueue: Queue = { ...queue }
+        for (const key of Object.keys(newQueue)) {
+          if (!newQueue[key].hasPass) {
+            delete newQueue[key]
+          }
+        }
+        for (const qs of update) {
+          newQueue[qs.serverPort] = {
+            ...qs,
+            hasPass: false
+          }
+        }
+
+        return newQueue
+      })
     })
     eventSource.addEventListener('PassEvent', ({ data }: any) => {
       console.log(data)
-      const update: ServerPassUpdate = JSON.parse(data)
-      const newQueue: Queue = { ...queue }
-      for (const port of Object.keys(newQueue)) {
-        newQueue[port].hasPass = false
-      }
-      for (const port of update) {
-        newQueue[port] = {
-          hasPass: true
+      setQueue((queue) => {
+        const update: ServerPassUpdate = JSON.parse(data)
+        const newQueue: Queue = {...queue}
+        for (const port of Object.keys(newQueue)) {
+          newQueue[port].hasPass = false
         }
-      }
-      // console.log(newQueue)
-      setQueue(newQueue)
+        for (const port of update) {
+          newQueue[port] = {
+            hasPass: true
+          }
+        }
+
+        return newQueue
+      });
     })
     eventSource.onerror = (event => {
       console.log(event)

@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { ServerPortDto } from '../common/dto/serverPort.dto';
 import { ServersService } from './servers.service';
-import { filter, map, merge, Observable } from 'rxjs';
+import { filter, map, merge, Observable, pairwise, startWith } from 'rxjs';
 import { PassEvent, QueueEvent, StatusEventsService } from '../status-events/status-events.service';
 import { JwtAuthGuard } from '@/src/auth/guards/jwt-auth.guard';
 import { RequestUserDto } from '@/src/common/dto/requestUser.dto';
@@ -45,8 +45,8 @@ export class ServersController {
 
   @UseGuards(JwtAuthGuard)
   @Sse('status-events')
-  statusEvents(@Request() {user: {ckey, adminFlags}}: RequestUserDto, @Ip() ip: string): Observable<MessageEvent> {
-    this.ipLinkService.linkIp(ckey, ip)
+  async statusEvents(@Request() {user: {ckey, adminFlags}}: RequestUserDto, @Ip() ip: string): Promise<Observable<MessageEvent>> {
+    await this.ipLinkService.linkIp(ckey, ip)
     if ((adminFlags & (AdminFlag.R_MENTOR | AdminFlag.R_MOD | AdminFlag.R_ADMIN)) !== 0) {
       this.passService.addPassesForCkey(ckey)
     }
@@ -63,8 +63,10 @@ export class ServersController {
           })
           .filter((serverQueue) => serverQueue.position !== -1)
       }),
-      filter((serverQueues) => serverQueues.length > 0),
-      map((serverQueues) => {
+      startWith(null),
+      pairwise(),
+      filter(([prev, serverQueues]) => serverQueues.length > 0 || prev.length > 0),
+      map(([, serverQueues]) => {
         const event = new QueueEvent()
         event.data = serverQueues
         return event
