@@ -7,6 +7,7 @@ import { ByondModule } from '../byond/byond.module';
 import { IpLinkModule } from '@/src/ipLink/ipLink.module';
 import { PlayerListModule } from '../playerList/playerList.module';
 import { WebhooksModule } from '../webhooks/webhooks.module';
+import { PassModule } from '../pass/pass.module'
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { WebhooksModule } from '../webhooks/webhooks.module';
     ByondModule,
     IpLinkModule,
     PlayerListModule,
+    PassModule,
     forwardRef(() => WebhooksModule),
   ],
   controllers: [QueueController],
