@@ -6,9 +6,10 @@ import { useEffect, useState } from 'react'
 import { Button, Card, Col, Container, Row, Stack } from 'react-bootstrap'
 import styles from '../styles/Home.module.css'
 import { Server } from '../src/ServerCard/ServerCard'
-import EventSource from 'eventsource'
+import { EventSourcePolyfill }  from 'event-source-polyfill'
 import { Queue } from '../src/ServerCard/ServerCard'
 
+const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL
 
 export type ServerPort = string
 
@@ -24,7 +25,7 @@ export type ServerPassUpdate = ServerPort[]
 
 
 export async function getStaticProps() {
-  const res = await fetch(`http://localhost:3000/api/v1/servers/status`, {
+  const res = await fetch(`${backendUrl}/api/v1/servers/status`, {
     cache: 'no-cache',
   })
   const servers: Server[] = await res.json()
@@ -40,18 +41,22 @@ export async function getStaticProps() {
 
 async function fetchQueueState(token:string): Promise<Queue> {
   const queueData = await fetch(
-    'http://localhost:3000/api/v1/queue/status',
+    `${backendUrl}/api/v1/queue/status`,
     {
       headers: {
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${token}`,
+        'pragma': 'no-cache',
+        'cache-control': 'no-cache',
       }
     }
   )
   const passData = await fetch(
-    'http://localhost:3000/api/v1/pass',
+    `${backendUrl}/api/v1/pass`,
     {
       headers: {
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${token}`,
+        'pragma': 'no-cache',
+        'cache-control': 'no-cache',
       }
     }
   )
@@ -93,19 +98,21 @@ function Home({ initialServers }: InferGetServerSidePropsType<typeof getStaticPr
     }
     load()
 
-    const eventSource = new EventSource(
-      'http://localhost:3000/api/v1/servers/status-events',
+    const eventSource = new EventSourcePolyfill (
+      `${backendUrl}/api/v1/servers/status-events`,
       {
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          'pragma': 'no-cache',
+          'cache-control': 'no-cache',
         }
       }
 
     );
-    eventSource.addEventListener('StatusEvent', ({ data }) => {
+    eventSource.addEventListener('StatusEvent', ({ data }: any) => {
       setServers(JSON.parse(data))
     })
-    eventSource.addEventListener('QueueEvent', ({ data }) => {
+    eventSource.addEventListener('QueueEvent', ({ data }: any) => {
       console.log(data)
       console.log(queue)
       const update: ServerQueueStatus = JSON.parse(data)
@@ -117,10 +124,10 @@ function Home({ initialServers }: InferGetServerSidePropsType<typeof getStaticPr
         }
       }
 
-      console.log(newQueue)
+      // console.log(newQueue)
       setQueue(newQueue)
     })
-    eventSource.addEventListener('PassEvent', ({ data }) => {
+    eventSource.addEventListener('PassEvent', ({ data }: any) => {
       console.log(data)
       const update: ServerPassUpdate = JSON.parse(data)
       const newQueue: Queue = { ...queue }
@@ -132,7 +139,7 @@ function Home({ initialServers }: InferGetServerSidePropsType<typeof getStaticPr
           hasPass: true
         }
       }
-      console.log(newQueue)
+      // console.log(newQueue)
       setQueue(newQueue)
     })
     eventSource.onerror = (event => {

@@ -2,6 +2,8 @@ import * as React from 'react';
 import { Button, Card, Col, Container, Row, Stack } from 'react-bootstrap'
 import Link from 'next/link'
 
+const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL
+
 export const DescItem = (title: string, data: string) => {
   return (
     <Stack>
@@ -56,9 +58,9 @@ export default function ServerCard(server: Server, token: string, queue?: Server
       }
       let action: string
       if (queue != null) {
-        action = "http://localhost:3000/api/v1/queue/remove"
+        action = `${backendUrl}/api/v1/queue/remove`
       } else {
-        action = "http://localhost:3000/api/v1/queue/add"
+        action = `${backendUrl}/api/v1/queue/add`
       }
 
       const response = await fetch(action, {
@@ -75,7 +77,11 @@ export default function ServerCard(server: Server, token: string, queue?: Server
         body: JSON.stringify(data), // body data type must match "Content-Type" header
       });
     } else {
-      window.open(`byond://${server.connection_address}:${server.port}`)
+      const redirectLink = document.createElement('a')
+      redirectLink.href = `byond://${server.connection_address}:${server.port}`
+      redirectLink.click()
+      window.location.href = 'byond://winset?command=.quit'
+      // window.location.href= `byond://${server.connection_address}:${server.port}`
     }
   }
 
@@ -88,7 +94,7 @@ export default function ServerCard(server: Server, token: string, queue?: Server
       }
       if (queue.position != null) {
         return (
-          <Button onClick={handleClick} variant="primary">{`В очереди (${queue.position} из ${queue.total})`}</Button>
+          <Button onClick={handleClick} variant="primary">{`В очереди (${queue.position+1} из ${queue.total})`}</Button>
         )
       }
     }
@@ -106,7 +112,7 @@ export default function ServerCard(server: Server, token: string, queue?: Server
         <Container>
           <Row>
             <Col>
-              {DescItem("Слотов", `${server.status?.slots.occupied || 0} / ${server.status?.slots.max || '∞'}`)}
+              {DescItem("Слотов", `${server.status?.slots?.occupied || 0} / ${server.status?.slots?.max || '∞'}`)}
             </Col>
             {
               server.queued && <Col>
