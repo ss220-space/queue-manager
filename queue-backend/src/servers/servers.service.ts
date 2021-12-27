@@ -3,32 +3,27 @@ import IORedis from 'ioredis';
 import { RedisService } from 'nestjs-redis';
 import { servers } from '@/queue.config.json';
 import { PlayerListService } from '../playerList/playerList.service';
-
-export type ServerStatus = {
-  mode: string;
-  respawn: number;
-  enter: number;
-  roundtime: string;
-  listed: string;
-  mapname: string;
-  players: number;
-}
+import { InternalEvent } from '../common/enums/internalEvent.enum';
+import { OnEvent } from '@nestjs/event-emitter';
+import { StatusEventsService } from '../status-events/status-events.service';
+import { ServerStatus } from './dto/serverStatus.dto';
 
 @Injectable()
 export class ServersService {
   constructor(
     private readonly redisService: RedisService,
     private readonly playerListService: PlayerListService,
+    private readonly statusEventsService: StatusEventsService,
   ) {
     this.redis = this.redisService.getClient()
   }
   private readonly logger = new Logger(ServersService.name);
   private readonly redis: IORedis.Redis;
   
-  async server(serverPort: string) {
-    const status =  await this.redis.get(`byond_${serverPort}_status`)
+  async server(serverPort: string): Promise<ServerStatus> {
+    const status = await this.redis.get(`byond_${serverPort}_status`)
 
-    const { mode, respawn, enter, roundtime, listed, mapname, players }: ServerStatus = JSON.parse(status) || {}
+    const { mode, respawn, enter, roundtime, listed, mapname, players } = JSON.parse(status) || {}
     const { name, port, queued, desc, connection_address } = servers[serverPort]
 
     const slots = queued ? await this.playerListService.getSlotStats(serverPort) : { max: 0, occupied: players}
@@ -53,9 +48,14 @@ export class ServersService {
     }
   }
 
-  async servers() {
+  async servers(): Promise<ServerStatus[]> {
     return await Promise.all(Object.keys(servers).map(async serverPort => {
       return await this.server(serverPort)
     }))
+  }
+
+  @OnEvent(InternalEvent.ByondStatusUpdate, {promisify: true})
+  async handleByondStatusUpdate(): Promise<void> {
+    this.statusEventsService.onStatusUpdate(await this.servers());
   }
 }

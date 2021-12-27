@@ -12,6 +12,8 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ServersModule } from './servers/servers.module';
+import { StatusEventsModule } from './status-events/status-events.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
@@ -25,12 +27,14 @@ import { ServersModule } from './servers/servers.module';
     }),
     PrismaModule,
     ScheduleModule.forRoot(),
+    EventEmitterModule.forRoot(),
     AuthModule,
     ByondModule,
     WebhooksModule,
     QueueModule,
     UsersModule,
     ServersModule,
+    StatusEventsModule,
   ],
 })
 

@@ -4,11 +4,14 @@ import fetchByond from './http2byond'
 import { RedisService } from 'nestjs-redis'
 import IORedis from 'ioredis';
 import { Interval } from '@nestjs/schedule'
+import { EventEmitter2 } from '@nestjs/event-emitter'
+import { InternalEvent } from '../common/enums/internalEvent.enum';
 
 @Injectable()
 export class ByondService {
   constructor(
     private readonly redisService: RedisService,
+    private eventEmitter: EventEmitter2,
   ) {
     this.redis = this.redisService.getClient()
   }
@@ -71,6 +74,7 @@ export class ByondService {
           return
         await this.redis.set(`byond_${serverPort}_status`, JSON.stringify(fetchedStatus))
       })
+    this.eventEmitter.emit(InternalEvent.ByondStatusUpdate)
   }
 
   
