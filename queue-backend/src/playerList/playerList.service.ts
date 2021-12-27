@@ -40,7 +40,7 @@ export class PlayerListService {
       time: Date.now(),
     }
     await this.savePlayerList(serverPort, playerList)
-    await this.passService.addCKeyPass(ckey, serverPort)
+    await this.passService.addPassForCkey(ckey, serverPort)
   }
 
   private async savePlayerList(serverPort: string, playerList: PlayerListDto): Promise<void> {

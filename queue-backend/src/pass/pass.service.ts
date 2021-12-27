@@ -3,6 +3,7 @@ import { RedisService } from 'nestjs-redis';
 import { Redis } from 'ioredis';
 import { EventEmitter2 } from '@nestjs/event-emitter'
 import { InternalEvent } from '../common/enums/internalEvent.enum'
+import { queuedServerList } from '../config/server-config';
 
 @Injectable()
 export class PassService {
@@ -17,7 +18,7 @@ export class PassService {
 
   private redis: Redis
 
-  async addCKeyPass(ckey: string, serverPort: string): Promise<void> {
+  async addPassForCkey(ckey: string, serverPort: string): Promise<void> {
     if (!await this.redis.sadd(`passes_${serverPort}`, ckey)) {
       this.logger.warn(`player '${ckey}' already has pass to ${serverPort}`)
       return
@@ -30,6 +31,20 @@ export class PassService {
 
     await this.notifyPassUpdate(ckey)
     this.eventEmitter.emit(InternalEvent.PassAdded, { ckey, serverPort })
+  }
+
+  async checkPass(ckey: string, serverPort: string): Promise<boolean> {
+    return !!await this.redis.sismember(`pass:${ckey}`, serverPort)
+  }
+
+  async addPassesForCkey(ckey: string): Promise<void> {
+    for (const {port} of queuedServerList) {
+      if (await this.checkPass(ckey, `${port}`)) {
+        continue
+      }
+
+      await this.addPassForCkey(ckey, `${port}`)
+    }
   }
 
   async getServerPasses(serverPort: string): Promise<string[]> {
