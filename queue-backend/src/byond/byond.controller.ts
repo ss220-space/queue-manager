@@ -10,7 +10,7 @@ import { RolesGuard } from '../roles/roles.guard'
 export class ByondController {
   constructor(private readonly byondService: ByondService) { }
 
-  @Get('playerlist_ext/:server_port')
+  @Get('playerlist_ext/:serverPort')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(AdminFlag.R_ADMIN, AdminFlag.R_BAN)
   async getPlayerlistExt(@Param() { serverPort }: ServerPortDto): Promise<string> {

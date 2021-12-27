@@ -9,7 +9,7 @@ export class WebhooksController {
     private readonly webhookService: WebhooksService,
   ) { }
 
-  @Post('status/:server_port')
+  @Post('status/:serverPort')
   async pushStatus(@Param() { serverPort }: ServerPortDto, @Body() body: StatusDto): Promise<string> {
 
     if (! await this.webhookService.pushStatus(serverPort, body)) {
