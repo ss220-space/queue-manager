@@ -10,6 +10,7 @@ import { InternalEvent } from '../common/enums/internalEvent.enum'
 import { QueuesState } from '../common/queues-state'
 import { Interval } from '@nestjs/schedule'
 import { queuedServerList } from '../config/server-config'
+import { PassService } from '../pass/pass.service'
 
 
 
@@ -20,6 +21,7 @@ export class QueueService {
   constructor(
     private readonly redisService: RedisService,
     private readonly playerListService: PlayerListService,
+    private readonly passService: PassService,
     @Inject(forwardRef(() => WebhooksService))
     private readonly webhooksService: WebhooksService,
     private readonly eventEmitter: EventEmitter2,
@@ -30,6 +32,8 @@ export class QueueService {
   private readonly logger = new Logger(QueueService.name);
 
   async addToQueue(serverPort: string, ckey: string): Promise<boolean> {
+    if (await this.passService.checkPass(ckey, serverPort)) return false
+
     const newEntry = {
       ckey,
     }
