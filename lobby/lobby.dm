@@ -25,7 +25,7 @@ var/global/datum/http_system/SShttp
 
     SShttp.create_async_request(
         RUSTG_HTTP_METHOD_POST,
-        "[BACKEND_URL]/api/webhooks/authorize",
+        "[BACKEND_URL]/api/v1/auth/authorize",
         json_encode(data),
         headers,
         cb
