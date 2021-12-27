@@ -10,7 +10,8 @@
       "desc": "Тестовый сервер",
       "extra": "",
       "connection_address": "game.ss220.space",
-      "test": true
+      "test": true,
+      "comms_password": "qwerty"
     },
     "7721": {
       "name": "Paradise Main",
@@ -25,14 +26,14 @@
     },
     "7722": {
       "name": "WL Prime",
-      "ip": "10.222.2.7",
+      "ip": "127.0.0.1",
       "port": 7722,
       "topic": "?status",
       "format": "json",
       "queued": false,
       "desc": "здесь играют стримеры",
       "extra": "(НСН Кибериада)",
-      "connection_address": "play.ss220.space"
+      "connection_address": "game.ss220.space"
     },
     "7723": {
       "name": "Paradise WL",

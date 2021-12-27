@@ -40,7 +40,8 @@ export class ByondService {
 
   async getPlayerlistExt(id: string): Promise<any> {
     const server = { ...servers[id] }
-    server.topic = '?playerlist_ext'
+    const key = server.comms_password ? `&key=${server.comms_password}` : null
+    server.topic = `?playerlist_ext${key}`
 
     try {
       const queryByond = await fetchByond(server)
