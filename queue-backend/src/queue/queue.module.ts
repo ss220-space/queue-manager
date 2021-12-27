@@ -19,5 +19,6 @@ import { WebhooksModule } from '../webhooks/webhooks.module';
   ],
   controllers: [QueueController],
   providers: [QueueService],
+  exports: [QueueService],
 })
 export class QueueModule { }

@@ -7,6 +7,7 @@ import { InternalEvent } from '../common/enums/internalEvent.enum';
 import { OnEvent } from '@nestjs/event-emitter';
 import { StatusEventsService } from '../status-events/status-events.service';
 import { ServerStatus } from './dto/serverStatus.dto';
+import { QueueService } from '../queue/queue.service';
 
 @Injectable()
 export class ServersService {
@@ -14,6 +15,7 @@ export class ServersService {
     private readonly redisService: RedisService,
     private readonly playerListService: PlayerListService,
     private readonly statusEventsService: StatusEventsService,
+    private readonly queueService: QueueService,
   ) {
     this.redis = this.redisService.getClient()
   }
@@ -27,6 +29,7 @@ export class ServersService {
     const { name, port, queued, desc, connection_address } = servers[serverPort]
 
     const slots = queued ? await this.playerListService.getSlotStats(serverPort) : { max: 0, occupied: players}
+    const queueSize = queued ? await this.queueService.queueSize(serverPort) : 0
 
     const stat = status ? {
       mode,
@@ -36,6 +39,7 @@ export class ServersService {
       enter: Boolean(enter),
       listed: Boolean(listed),
       slots,
+      queueSize,
     } : null
     
     return {

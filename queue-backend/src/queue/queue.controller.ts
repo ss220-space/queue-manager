@@ -1,8 +1,8 @@
-import { Controller, Ip, Post, Body, HttpStatus, HttpException, UseGuards, Request, Get, Param } from '@nestjs/common';
+import { Controller, Ip, Post, Body, HttpStatus, HttpException, UseGuards, Request, Get} from '@nestjs/common';
 import { QueueService } from './queue.service';
 import { IpLinkService } from '../ipLink/ipLink.service';
 import { RequestUserDto } from '../common/dto/requestUser.dto';
-import { QueueStatusDto } from './dto/queueStatus.dto';
+import { ServerQueueStatus } from './dto/queueStatus.dto';
 import { ServerPortDto } from '../common/dto/serverPort.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
@@ -35,9 +35,9 @@ export class QueueController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('status/:serverPort')
-  async getQueueStatus(@Param() { serverPort  }: ServerPortDto, @Request() { user: { ckey } }: RequestUserDto): Promise<QueueStatusDto> {
-    return await this.queueService.queueStatus(serverPort, ckey)
+  @Get('status')
+  async getQueueStatus(@Request() { user: { ckey } }: RequestUserDto): Promise<ServerQueueStatus> {
+    return await this.queueService.queueStatus(ckey)
   }
 }
 

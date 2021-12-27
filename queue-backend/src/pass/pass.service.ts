@@ -1,46 +1,55 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { RedisService } from 'nestjs-redis';
-import { IptablesEventsService } from '../iptablesEvents/iptablesEvents.service';
 import { Redis } from 'ioredis';
-import { IpLinkService } from '../ipLink/ipLink.service';
+import { EventEmitter2 } from '@nestjs/event-emitter'
+import { InternalEvent } from '../common/enums/internalEvent.enum'
 
 @Injectable()
 export class PassService {
   constructor(
     private readonly redisService: RedisService,
-    private readonly iptablesEventsService: IptablesEventsService,
-    private readonly ipLinkService: IpLinkService,
+    private readonly eventEmitter: EventEmitter2,
   ) {
     this.redis = this.redisService.getClient()
   }
 
+  private readonly logger = new Logger(PassService.name)
+
   private redis: Redis
 
-  async addPass(playerIp: string, serverPort: number): Promise<void> {
-    if (!await this.redis.sadd(`passes_${serverPort}`, playerIp)) {
+  async addCKeyPass(ckey: string, serverPort: string): Promise<void> {
+    if (!await this.redis.sadd(`passes_${serverPort}`, ckey)) {
+      this.logger.warn(`player '${ckey}' already has pass to ${serverPort}`)
       return
     }
-    this.iptablesEventsService.onAddedPass(playerIp, serverPort)
+    if (!await this.redis.sadd(`pass:${ckey}`, serverPort)) {
+      this.logger.warn(`player '${ckey}' has mismatch in passes for ${serverPort}`)
+      return
+    }
+    this.logger.debug(`Added pass for ${ckey} to ${serverPort}`)
+
+    await this.notifyPassUpdate(ckey)
+    this.eventEmitter.emit(InternalEvent.PassAdded, { ckey, serverPort })
   }
 
-  async addCKeyPass(ckey: string, serverPort: number): Promise<void> {
-    const ip = await this.ipLinkService.getIp(ckey)
-    await this.addPass(ip, serverPort);
-  }
-
-  async getPasses(serverPort: number): Promise<string[]> {
+  async getServerPasses(serverPort: string): Promise<string[]> {
     return await this.redis.smembers(`passes_${serverPort}`)
   }
 
-  async removePass(playerIp: string, serverPort: number): Promise<void> {
-    if (!await this.redis.srem(`passes_${serverPort}`, playerIp)) {
-      return
-    }
-    this.iptablesEventsService.onRemovedPass(playerIp, serverPort)
+  async getPassesByCkey(ckey: string): Promise<string[]> {
+    return await this.redis.smembers(`pass:${ckey}`)
   }
 
-  async removeCKeyPass(ckey: string, serverPort: number): Promise<void> {
-    const ip = await this.ipLinkService.getIp(ckey)
-    await this.removePass(ip, serverPort);
+  private async notifyPassUpdate(ckey: string): Promise<void> {
+    this.eventEmitter.emit(InternalEvent.PassUpdate, { ckey, passes: await this.redis.smembers(`pass:${ckey}`) })
+  }
+
+  async removeCKeyPass(ckey: string, serverPort: string): Promise<void> {
+    await this.redis.srem(`passes_${serverPort}`, ckey)
+    await this.redis.srem(`pass:${ckey}`, serverPort)
+    this.logger.debug(`Removed pass for ${ckey} to ${serverPort}`)
+
+    await this.notifyPassUpdate(ckey)
+    this.eventEmitter.emit(InternalEvent.PassRemoved, { ckey, serverPort })
   }
 }

@@ -1,10 +1,14 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { IptablesEventsGateway } from './iptablesEvents.gateway';
 import { IptablesEventsService } from './iptablesEvents.service';
 import { PassModule } from '../pass/pass.module';
+import { IpLinkModule } from '../ipLink/ipLink.module'
 
 @Module({
-  imports: [forwardRef(() => PassModule)],
+  imports: [
+    PassModule,
+    IpLinkModule,
+  ],
   providers: [IptablesEventsGateway, IptablesEventsService],
   exports: [IptablesEventsService],
 })

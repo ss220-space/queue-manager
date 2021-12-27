@@ -7,6 +7,7 @@ import { ByondService } from '../byond/byond.service';
 import { ConfigService } from '@nestjs/config';
 import { PassService } from '../pass/pass.service';
 import { WebhooksService } from '../webhooks/webhooks.service';
+import { ckeySanitize } from '../common/utils'
 
 export class PlayerInfoDto {
   time: number
@@ -39,7 +40,7 @@ export class PlayerListService {
       time: Date.now(),
     }
     await this.savePlayerList(serverPort, playerList)
-    await this.passService.addCKeyPass(ckey, parseInt(serverPort))
+    await this.passService.addCKeyPass(ckey, serverPort)
   }
 
   private async savePlayerList(serverPort: string, playerList: PlayerListDto): Promise<void> {
@@ -70,10 +71,34 @@ export class PlayerListService {
     return Object.keys(playerlist).includes(ckey)
   }
 
-  private async onPlayerRemoved(serverPort: string, ckey: string): Promise<void> {
-    await this.passService.removeCKeyPass(ckey, parseInt(serverPort))
+  private async removePlayer(serverPort: string, ckey: string): Promise<void> {
+    await this.passService.removeCKeyPass(ckey, serverPort)
   }
 
+
+  //@Interval(10000)
+  async removeDanglingPlayers(): Promise<void> {
+    this.logger.debug('removeDanglingPlayers Called (every 10 seconds)')
+    for (const [serverPort, {queued}] of Object.entries(servers)) {
+      if (!queued) continue
+
+      const playerList = await this.getPlayerList(serverPort)
+      const keyList = Object.keys(playerList)
+      const newPlayerList = {}
+      for (const key of keyList) {
+        const ckey = ckeySanitize(key)
+        this.logger.debug(`Next player is ${ckey}`)
+        const fiveMinutesAgo = Date.now() - this.configService.get<number>('queue.ghost_away_threshold')
+        if (playerList[ckey]?.time < fiveMinutesAgo) {
+            await this.removePlayer(<string>serverPort, ckey)
+        } else {
+            newPlayerList[ckey] = playerList[ckey]
+        }
+      }
+
+      await this.savePlayerList(<string>serverPort, newPlayerList)
+    }
+  }
   // @Interval(10000)
   async handleUpdateByondPlayerlist(): Promise<void> {
     this.logger.debug('handleUpdateByondPlayerlist Called (every 10 seconds)')
@@ -96,7 +121,7 @@ export class PlayerListService {
       this.logger.debug(fetchedPlayerlist)
 
       fetchedPlayerlist = fetchedPlayerlist.map(key => {
-        return this.ckeySanitize(key)
+        return ckeySanitize(key)
       })
 
       const lastPlayerlist = await this.getPlayerList(<string>serverPort)
@@ -108,12 +133,12 @@ export class PlayerListService {
 
       if (keyList) {
         for (const key of keyList) {
-          const ckey = this.ckeySanitize(key)
+          const ckey = ckeySanitize(key)
           this.logger.debug(`Next player is ${ckey}`)
           if (!fetchedPlayerlist?.includes(ckey)) {
             const fiveMinutesAgo = Date.now() - this.configService.get<number>('queue.ghost_away_threshold')
             if (lastPlayerlist[ckey]?.time < fiveMinutesAgo) {
-              await this.onPlayerRemoved(<string>serverPort, ckey)
+              await this.removePlayer(<string>serverPort, ckey)
               continue
             } else {
               newEntries[ckey] = lastPlayerlist[ckey]
@@ -135,8 +160,4 @@ export class PlayerListService {
     }
 
   }
-
-  ckeySanitize(key: string): string {
-    return key.toLowerCase().replace(/[-_.\s]+/g, '').trim();
-  };
 }

@@ -15,7 +15,8 @@ export class IpLinkService {
     await this.redis.set(`ip_of:${ckey}`, ip.split(':').pop())
   }
 
-  async getIp(ckey: string): Promise<string> {
-    return await this.redis.get(`ip_of:${ckey}`)
+  async getIp(ckey: string): Promise<string[]> {
+    const ip = await this.redis.get(`ip_of:${ckey}`)
+    return [ip]
   }
 }

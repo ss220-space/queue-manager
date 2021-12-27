@@ -7,100 +7,138 @@ import { Button, Card, Col, Container, Row, Stack } from 'react-bootstrap'
 import styles from '../styles/Home.module.css'
 import { Server } from '../src/ServerCard/ServerCard'
 import EventSource from 'eventsource'
+import { Queue } from '../src/ServerCard/ServerCard'
 
-export type QueueStatusDto = QueuePassed | QueuePosition | NonQueued
 
-export interface NonQueued {
-  status: "not-queued"
-}
+export type ServerPort = string
 
-export interface QueuePassed {
-  connection_url: string
-}
+export type ServerQueueStatus =
+  {
+    serverPort: ServerPort
+    position: number
+    total: number
+  }[]
 
-export interface QueuePosition {
-  position: number
-  total: number
-}
+export type ServerPassUpdate = ServerPort[]
+
+
 
 export async function getStaticProps() {
-  const res = await fetch(`http://game.ss220.space:3000/api/v1/servers/status`, {
+  const res = await fetch(`http://localhost:3000/api/v1/servers/status`, {
     cache: 'no-cache',
   })
   const servers: Server[] = await res.json()
 
   return {
     props: {
-      initinalServers: servers,
+      initialServers: servers,
     },
     revalidate: 10, // In seconds
   }
 }
 
-function Home({ initinalServers }: InferGetServerSidePropsType<typeof getStaticProps>) {
+
+async function fetchQueueState(token:string): Promise<Queue> {
+  const queueData = await fetch(
+    'http://localhost:3000/api/v1/queue/status',
+    {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    }
+  )
+  const passData = await fetch(
+    'http://localhost:3000/api/v1/pass',
+    {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    }
+  )
+
+  const queueStatus: ServerQueueStatus = await queueData.json()
+
+
+  const newQueue: Queue = {}
+  for (const qs of queueStatus) {
+    newQueue[qs.serverPort] = {
+      ...qs,
+      hasPass: false
+    }
+  }
+
+  const passStatus: ServerPassUpdate = await passData.json()
+  for (const port of passStatus) {
+    newQueue[port] = {
+      hasPass: true
+    }
+  }
+  return newQueue
+}
+
+function Home({ initialServers }: InferGetServerSidePropsType<typeof getStaticProps>) {
   const [token, setToken] = useState('');
-  const [servers, setServers] = useState<Server[]>(initinalServers)
-  //const [queueStatus, setQueueStatus] = useState('');
+  const [servers, setServers] = useState<Server[]>(initialServers)
+  const [queue, setQueue] = useState<Queue>({})
 
   useEffect(() => {
     setToken(window.location.hash.split('#token=').pop()!)
   }, [])
 
-  // useEffect(() => {
-  //   const interval = setInterval(async () =>{
-  //     const response = await fetch(`http://game.ss220.space:3000/api/queue/status/7720?time=${Date.now()}`, {
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //         'Authorization': `Bearer ${token}`,
-  //       },
-  //       cache: 'no-cache',
-  //     });
-  //     const status = await response.text();
-  //     setQueueStatus(status);
-  //   }, 1000)
-  //   return function cleanup() {
-  //     clearInterval(interval)
-  //   };
-  // }, [token])
-
-  let joinedQueueStatus: string;
-
-  const handleJoinQueue = async () => {
-    const data = {
-      "server_port": "7720"
-    }
-    const response = await fetch("http://game.ss220.space:3000/api/queue/add", {
-      method: 'POST', // *GET, POST, PUT, DELETE, etc.
-      //mode: 'same-origin', // no-cors, *cors, same-origin
-      cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-      //credentials: 'same-origin', // include, *same-origin, omit
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      //redirect: 'follow', // manual, *follow, error
-      //referrerPolicy: 'no-referrer', // no-referrer, *client
-      body: JSON.stringify(data), // body data type must match "Content-Type" header
-    });
-    console.log(response)
-    if (response.ok) {
-      joinedQueueStatus = "Joined successful!"
-    } else {
-      const parsed = await response.json()
-      console.log(parsed)
-      joinedQueueStatus = parsed.message || "Error"
-    }
-  }
-
   useEffect(() => {
-    const eventSource = new EventSource('http://game.ss220.space:3000/api/v1/servers/status-events');
+    if (token == '') return
+
+    const load = async () => {
+      setQueue(await fetchQueueState(token))
+    }
+    load()
+
+    const eventSource = new EventSource(
+      'http://localhost:3000/api/v1/servers/status-events',
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      }
+
+    );
     eventSource.addEventListener('StatusEvent', ({ data }) => {
       setServers(JSON.parse(data))
+    })
+    eventSource.addEventListener('QueueEvent', ({ data }) => {
+      console.log(data)
+      console.log(queue)
+      const update: ServerQueueStatus = JSON.parse(data)
+      const newQueue: Queue = { ...queue }
+      for (const qs of update) {
+        newQueue[qs.serverPort] = {
+          ...qs,
+          hasPass: false
+        }
+      }
+
+      console.log(newQueue)
+      setQueue(newQueue)
+    })
+    eventSource.addEventListener('PassEvent', ({ data }) => {
+      console.log(data)
+      const update: ServerPassUpdate = JSON.parse(data)
+      const newQueue: Queue = { ...queue }
+      for (const port of Object.keys(newQueue)) {
+        newQueue[port].hasPass = false
+      }
+      for (const port of update) {
+        newQueue[port] = {
+          hasPass: true
+        }
+      }
+      console.log(newQueue)
+      setQueue(newQueue)
     })
     eventSource.onerror = (event => {
       console.log(event)
     })
-  }, [])
+  }, [token])
 
   return (
     <Container fluid>
@@ -115,7 +153,7 @@ function Home({ initinalServers }: InferGetServerSidePropsType<typeof getStaticP
         <Row xs={1} md={2} lg={3}>
           {servers.map(server => (
             <Col className='p-3' key={server.name}>
-              { ServerCard(server) }
+              { ServerCard(server, token, queue[server.port]) }
             </Col>
           ))}
         </Row>

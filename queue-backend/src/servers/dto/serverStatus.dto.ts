@@ -15,5 +15,6 @@ export class ServerStatus {
       max: number;
       occupied: number;
     };
+    queueSize: number
   }
 }

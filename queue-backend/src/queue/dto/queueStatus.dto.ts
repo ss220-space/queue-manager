@@ -1,15 +1,12 @@
 
-export type QueueStatusDto = QueuePassed | QueuePosition | NonQueued
+export type ServerPort = string
 
-export class NonQueued {
-  status = 'not-queued'
-}
+export type ServerQueueStatus =
+  {
+    serverPort: ServerPort
+    position: number
+    total: number
+  }[]
 
-export class QueuePassed {
-  connection_url: string
-}
+export type ServerPassUpdate = ServerPort[]
 
-export class QueuePosition {
-  position: number
-  total: number
-}
