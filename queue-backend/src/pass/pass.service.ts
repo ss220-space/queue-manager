@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { RedisService } from 'nestjs-redis';
-import { EventsService } from '../events/events.service';
+import { IptablesEventsService } from '../iptablesEvents/iptablesEvents.service';
 import { Redis } from 'ioredis';
 import { IpLinkService } from '../ipLink/ipLink.service';
 
@@ -8,7 +8,7 @@ import { IpLinkService } from '../ipLink/ipLink.service';
 export class PassService {
   constructor(
     private readonly redisService: RedisService,
-    private readonly eventsService: EventsService,
+    private readonly iptablesEventsService: IptablesEventsService,
     private readonly ipLinkService: IpLinkService,
   ) {
     this.redis = this.redisService.getClient()
@@ -20,7 +20,7 @@ export class PassService {
     if (!await this.redis.sadd(`passes_${serverPort}`, playerIp)) {
       return
     }
-    this.eventsService.onAddedPass(playerIp, serverPort)
+    this.iptablesEventsService.onAddedPass(playerIp, serverPort)
   }
 
   async addCKeyPass(ckey: string, serverPort: number): Promise<void> {
@@ -36,7 +36,7 @@ export class PassService {
     if (!await this.redis.srem(`passes_${serverPort}`, playerIp)) {
       return
     }
-    this.eventsService.onRemovedPass(playerIp, serverPort)
+    this.iptablesEventsService.onRemovedPass(playerIp, serverPort)
   }
 
   async removeCKeyPass(ckey: string, serverPort: number): Promise<void> {

@@ -8,7 +8,7 @@ import {
 import { Server } from 'ws';
 import { forwardRef, Inject, Logger } from '@nestjs/common';
 import { concat, filter, from, map, Observable } from 'rxjs';
-import { EventsService } from './events.service';
+import { IptablesEventsService } from './iptablesEvents.service';
 import { PassService } from '../pass/pass.service';
 
 export class IptablesInitRequestDto {
@@ -28,16 +28,16 @@ export class IptablesEventMessageDto {
 }
 
 @WebSocketGateway(8080)
-export class EventsGateway {
+export class IptablesEventsGateway {
   constructor(
     @Inject(forwardRef(() => PassService))
     private readonly passService: PassService,
-    @Inject(forwardRef(() => EventsService))
-    private readonly eventService: EventsService,
+    @Inject(forwardRef(() => IptablesEventsService))
+    private readonly eventService: IptablesEventsService,
   ) { }
 
   @WebSocketServer() server: Server;
-  private logger: Logger = new Logger(EventsGateway.name);
+  private logger: Logger = new Logger(IptablesEventsGateway.name);
 
   @SubscribeMessage('iptables')
   handleEvent(@MessageBody() data: IptablesInitRequestDto): Observable<WsResponse<any>> {

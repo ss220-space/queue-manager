@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { Observable, Subscriber } from 'rxjs';
-import { IptablesEventMessageDto } from './events.gateway';
+import { IptablesEventMessageDto } from './iptablesEvents.gateway';
 
 @Injectable()
-export class EventsService {
+export class IptablesEventsService {
   constructor() {
     this.events = new Observable((subscriber) => {
       this.subscriber = subscriber
