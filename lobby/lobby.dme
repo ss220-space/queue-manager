@@ -4,3 +4,4 @@
 #include "http.dm"
 #include "callback.dm"
 #include "lobby.dm"
+#include "lobby.dmf"

@@ -1,0 +1,35 @@
+menu "menu"
+	elem 
+		name = "&File"
+		command = ""
+		saved-params = "is-checked"
+	elem 
+		name = "&Quit"
+		command = ".quit"
+		category = "&File"
+		saved-params = "is-checked"
+
+
+window "default"
+	elem "default"
+		type = MAIN
+		pos = 895,116
+		size = 1280x720
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		background-color = none
+		is-default = true
+		saved-params = "pos;size;is-minimized;is-maximized"
+		statusbar = false
+		macro = "macro"
+		menu = "menu"
+		outer-size = 1296x779
+		inner-size = 1280x720
+	elem "browser"
+		type = BROWSER
+		pos = 0,0
+		size = 1280x720
+		anchor1 = 0,0
+		anchor2 = 100,100
+		background-color = none
+		saved-params = ""
