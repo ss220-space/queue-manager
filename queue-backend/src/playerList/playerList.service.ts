@@ -50,6 +50,7 @@ export class PlayerListService {
   async getSlotStats(serverPort: string) {
     const reservedSlots = await this.getNewPlayerCount(serverPort)
     const status = await this.webhooksService.getStatus(serverPort)
+    if (!status) return null
 
     return {
       max: status.max_slots,
@@ -99,7 +100,7 @@ export class PlayerListService {
       await this.savePlayerList(<string>serverPort, newPlayerList)
     }
   }
-  // @Interval(10000)
+  @Interval(10000)
   async handleUpdateByondPlayerlist(): Promise<void> {
     this.logger.debug('handleUpdateByondPlayerlist Called (every 10 seconds)')
     const playerLists = Object.keys(servers)

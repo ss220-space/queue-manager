@@ -65,12 +65,14 @@ export class QueueService {
         continue
       }
 
-      const pos = await this.redis.lpos(`byond_queue_${port}}`, ckeyEntry)
-      const total = await this.redis.llen(`byond_queue_${port}}`)
+      const pos = await this.redis.lpos(`byond_queue_${port}`, ckeyEntry)
+      const total = await this.redis.llen(`byond_queue_${port}`)
 
+      console.log(pos)
       result.push({position: pos, total, serverPort: `${port}`})
     }
 
+    console.log(result)
     return result
   }
 
@@ -111,6 +113,7 @@ export class QueueService {
     if (!queueTop) return false
 
     const status = await this.playerListService.getSlotStats(serverPort)
+    if (!status) return false
     if (status.occupied >= status.max) return false
     const newPlayer = await this.redis.lpop(`byond_queue_${serverPort}`)
     await this.redis.srem(`byond_queue_${serverPort}_set`, newPlayer)
