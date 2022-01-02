@@ -1,3 +1,5 @@
+import { TickerState } from '@/src/common/enums/tickerState.enum';
+
 export class ServerStatus {
   name: string;
   desc: string;
@@ -5,6 +7,7 @@ export class ServerStatus {
   port: string;
   queued: string;
   status?: {
+    ticker_state: TickerState;
     mode: string;
     roundtime: string;
     mapname: string;

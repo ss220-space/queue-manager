@@ -20,6 +20,8 @@ export class ByondService {
 
   async fetchStatus(serverPort: string): Promise<any> {
     const server = servers[serverPort];
+    const key = server.comms_password ? `&key=${server.comms_password}` : null
+    server.topic = `${server.topic}${key}`
 
     try {
       const queryByond = await fetchByond(server)

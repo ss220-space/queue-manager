@@ -25,13 +25,14 @@ export class ServersService {
   async server(serverPort: string): Promise<ServerStatus> {
     const status = await this.redis.get(`byond_${serverPort}_status`)
 
-    const { mode, respawn, enter, roundtime, listed, mapname, players } = JSON.parse(status) || {}
+    const { mode, respawn, enter, roundtime, listed, mapname, players, ticker_state } = JSON.parse(status) || {}
     const { name, port, queued, desc, connection_address } = servers[serverPort]
 
     const slots = queued ? await this.playerListService.getSlotStats(serverPort) : { max: 0, occupied: players}
     const queueSize = queued ? await this.queueService.queueSize(serverPort) : 0
 
     const stat = status ? {
+      ticker_state,
       mode,
       roundtime,
       mapname,

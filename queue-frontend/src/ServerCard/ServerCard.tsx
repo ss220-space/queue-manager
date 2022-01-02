@@ -17,6 +17,14 @@ export const DescItem = (title: string, data: string) => {
   )
 }
 
+export enum TickerState {
+  Startup = 0,
+  Pregame = 1,
+  SettingUp = 2,
+  Playing = 3,
+  Finished = 4,
+}
+
 export type Server = {
   name: string;
   desc: string;
@@ -24,6 +32,7 @@ export type Server = {
   port: string;
   queued: boolean;
   status?: {
+    ticker_state: TickerState;
     mode: string;
     roundtime: string;
     mapname: string;
@@ -48,7 +57,15 @@ export type ServerQueue = {
   hasPass: boolean
 }
 
-
+const getTickerStateString = (tickerState: TickerState) => {
+  switch (tickerState) {
+    case TickerState.Startup: return 'Инициализация';
+    case TickerState.Pregame: return 'Лобби';
+    case TickerState.SettingUp: return 'Подготовка';
+    case TickerState.Playing: return 'Идёт игра';
+    case TickerState.Finished: return 'Завершение';
+  }
+}
 
 export default function ServerCard(server: Server, token: string, queueLoaded: boolean, queue?: ServerQueue) {
   async function handleClick() {
@@ -120,10 +137,10 @@ export default function ServerCard(server: Server, token: string, queueLoaded: b
           </Row>
           <Row>
             <Col>
-              {DescItem("Время раунда", server.status?.roundtime || '—')}
+              {DescItem("Время раунда", server.status?.roundtime || '??')}
             </Col>
             <Col>
-              {DescItem("Статус", "Идёт игра")}
+              {DescItem("Статус", server.status?.ticker_state ? getTickerStateString(server.status.ticker_state) : '??')}
             </Col>
           </Row>
 
