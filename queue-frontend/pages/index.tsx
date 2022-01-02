@@ -8,7 +8,8 @@ import { EventSourcePolyfill } from 'event-source-polyfill'
 import { CommonNavBar } from '../src/CommonNavBar/CommonNavBar'
 import { AdminFlag, hasFlag } from '../src/adminFlag.enum'
 
-const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL
+import { BanModal } from '@/src/BanModal/BanModal'
+import { backendUrl, getBackendData } from '../src/utils'
 
 export type ServerPort = string
 
@@ -42,21 +43,6 @@ export async function getStaticProps() {
   }
 }
 
-function getBackendData(
-  url: string,
-  token: string,
-): Promise<Response> {
-  return fetch(
-    `${backendUrl}${url}`,
-    {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'pragma': 'no-cache',
-        'cache-control': 'no-cache',
-      }
-    }
-  )
-}
 
 async function fetchQueueState(token:string): Promise<Queue> {
   const queueData = await getBackendData('/api/v1/queue/status', token);
@@ -176,6 +162,8 @@ function Home({ initialServers }: InferGetServerSidePropsType<typeof getStaticPr
       </Head>
 
       <CommonNavBar isAdmin={profile != null && hasFlag(profile, AdminFlag.R_ADMIN) && hasFlag(profile, AdminFlag.R_SERVER)} token={token}/>
+
+      { BanModal({ token, profile }) }
 
       <Container fluid>
         <Row xs={1} md={2} lg={3}>
