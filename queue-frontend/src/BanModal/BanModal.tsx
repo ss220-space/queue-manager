@@ -88,7 +88,7 @@ export function BanModal({token, profile}: BanModalProps) {
         <Modal.Title>Бан</Modal.Title>
       </Modal.Header>
       {ban &&
-          <Modal.Body>
+          <Modal.Body className="overflow-auto">
             {banMessage(ban)}
           </Modal.Body>
       }
