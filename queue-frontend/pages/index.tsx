@@ -2,7 +2,7 @@ import ServerCard from '@/src/ServerCard/ServerCard'
 import type { InferGetServerSidePropsType } from 'next'
 import Head from 'next/head'
 import { useEffect, useState } from 'react'
-import { Col, Container, Row } from 'react-bootstrap'
+import { Col, Container, Row, Toast, ToastContainer } from 'react-bootstrap'
 import { Queue, Server } from '../src/ServerCard/ServerCard'
 import { EventSourcePolyfill } from 'event-source-polyfill'
 import { CommonNavBar } from '../src/CommonNavBar/CommonNavBar'
@@ -10,6 +10,7 @@ import { AdminFlag, hasFlag } from '../src/adminFlag.enum'
 
 import { BanModal } from '@/src/BanModal/BanModal'
 import { backendUrl, getBackendData } from '../src/utils'
+import moment from 'moment'
 
 export type ServerPort = string
 
@@ -67,11 +68,39 @@ async function fetchQueueState(token:string): Promise<Queue> {
   return newQueue
 }
 
+
+type NewPassEvent = {
+  time: Date,
+  serverPort: string
+  show: boolean
+}
+
+function PassToasts(
+  servers: Server[],
+  passEvents: NewPassEvent[],
+  dropEvent: (e: NewPassEvent) => void
+) {
+  return <ToastContainer className="p-3" position="bottom-end">
+    {
+      passEvents?.map((event) => (
+        <Toast key={`${event.time}`} onClose={() => { dropEvent(event) }} delay={10000} autohide>
+          <Toast.Header>
+            <strong className="me-auto">{servers.find((server) => server.port == event.serverPort)?.name}</strong>
+            <small>{moment(event.time).fromNow()}</small>
+          </Toast.Header>
+          <Toast.Body>Получен доступ</Toast.Body>
+        </Toast>
+      ))
+    }
+  </ToastContainer>
+}
+
 function Home({ initialServers }: InferGetServerSidePropsType<typeof getStaticProps>) {
   const [token, setToken] = useState('');
   const [servers, setServers] = useState<Server[]>(initialServers)
   const [queue, setQueue] = useState<Queue>()
   const [profile, setProfile] = useState<UserProfile>()
+  const [passEvents, setPassEvents] = useState<NewPassEvent[]>([])
 
   useEffect(() => {
     setToken(window.location.hash.split('#token=').pop()!)
@@ -125,12 +154,32 @@ function Home({ initialServers }: InferGetServerSidePropsType<typeof getStaticPr
       setQueue((queue) => {
         const update: ServerPassUpdate = JSON.parse(data)
         const newQueue: Queue = {...queue}
+        const prevPasses = new Set()
         for (const port of Object.keys(newQueue)) {
+          if (newQueue[port]?.hasPass === true) {
+            prevPasses.add(port)
+          }
           newQueue[port].hasPass = false
         }
+
+
         for (const port of update) {
           newQueue[port] = {
             hasPass: true
+          }
+          if (!prevPasses.has(port)) {
+            new Audio("bikehorn.ogg").play()
+            setPassEvents(
+              (events) =>
+                [
+                  ...events,
+                  {
+                    time: new Date(),
+                    serverPort: port,
+                    show: false
+                  }
+                ]
+            )
           }
         }
 
@@ -164,6 +213,16 @@ function Home({ initialServers }: InferGetServerSidePropsType<typeof getStaticPr
       <CommonNavBar isAdmin={profile != null && hasFlag(profile, AdminFlag.R_ADMIN) && hasFlag(profile, AdminFlag.R_SERVER)} token={token}/>
 
       { BanModal({ token, profile }) }
+
+      {
+        PassToasts(
+          servers,
+          passEvents,
+          (event) => {
+            setPassEvents((events) => events.filter((e) => e !== event))
+          }
+        )
+      }
 
       <Container fluid>
         <Row xs={1} md={2} lg={3}>
