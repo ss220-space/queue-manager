@@ -46,6 +46,6 @@ export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {
     consumer
       .apply(RequestLoggingMiddleware)
-      .forRoutes('api');
+      .forRoutes('*');
   }
 }
