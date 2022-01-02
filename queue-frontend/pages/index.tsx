@@ -80,10 +80,10 @@ function PassToasts(
   passEvents: NewPassEvent[],
   dropEvent: (e: NewPassEvent) => void
 ) {
-  return <ToastContainer className="p-3" position="bottom-end">
+  return <ToastContainer className="p-3" position="top-end" style={{zIndex:1}}>
     {
       passEvents?.map((event) => (
-        <Toast key={`${event.time}`} onClose={() => { dropEvent(event) }} delay={10000} autohide bg="dark">
+        <Toast key={`${event.time}`} onClose={() => { dropEvent(event) }} delay={10000} autohide>
           <Toast.Header>
             <strong className="me-auto">{servers.find((server) => server.port == event.serverPort)?.name}</strong>
             <small>{moment(event.time).fromNow()}</small>
@@ -215,8 +215,6 @@ function Home({ initialServers }: InferGetServerSidePropsType<typeof getStaticPr
 
       <CommonNavBar isAdmin={profile != null && hasFlag(profile, AdminFlag.R_ADMIN) && hasFlag(profile, AdminFlag.R_SERVER)} token={token}/>
 
-      { BanModal({ token, profile }) }
-
       {
         PassToasts(
           servers,
@@ -226,6 +224,8 @@ function Home({ initialServers }: InferGetServerSidePropsType<typeof getStaticPr
           }
         )
       }
+
+      { BanModal({ token, profile }) }
 
       <Container fluid>
         <Row xs={1} md={2} lg={3}>
