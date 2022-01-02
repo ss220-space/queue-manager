@@ -168,7 +168,7 @@ function Home({ initialServers }: InferGetServerSidePropsType<typeof getStaticPr
             hasPass: true
           }
           if (!prevPasses.has(port)) {
-            new Audio("bikehorn.ogg").play()
+            new Audio("bikehorn.mp3").play()
             setPassEvents(
               (events) =>
                 [
