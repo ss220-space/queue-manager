@@ -14,6 +14,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ServersModule } from './servers/servers.module';
 import { StatusEventsModule } from './status-events/status-events.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { AdminModule } from './admin/admin.module'
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     UsersModule,
     ServersModule,
     StatusEventsModule,
+    AdminModule,
   ],
 })
 

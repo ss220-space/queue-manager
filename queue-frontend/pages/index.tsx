@@ -1,13 +1,12 @@
 import ServerCard from '@/src/ServerCard/ServerCard'
-import type { NextPage, InferGetServerSidePropsType } from 'next'
+import type { InferGetServerSidePropsType } from 'next'
 import Head from 'next/head'
-import Image from 'next/image'
 import { useEffect, useState } from 'react'
-import { Button, Card, Col, Container, Row, Stack } from 'react-bootstrap'
-import styles from '../styles/Home.module.css'
-import { Server } from '../src/ServerCard/ServerCard'
-import { EventSourcePolyfill }  from 'event-source-polyfill'
-import { Queue } from '../src/ServerCard/ServerCard'
+import { Col, Container, Row } from 'react-bootstrap'
+import { Queue, Server } from '../src/ServerCard/ServerCard'
+import { EventSourcePolyfill } from 'event-source-polyfill'
+import { CommonNavBar } from '../src/CommonNavBar/CommonNavBar'
+import { AdminFlag, hasFlag } from '../src/adminFlag.enum'
 
 const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL
 
@@ -22,6 +21,11 @@ export type ServerQueueStatus =
 
 export type ServerPassUpdate = ServerPort[]
 
+export type UserProfile = {
+  ckey: string
+  adminFlags: number
+  hasActiveBan: boolean
+}
 
 
 export async function getStaticProps() {
@@ -38,29 +42,25 @@ export async function getStaticProps() {
   }
 }
 
+function getBackendData(
+  url: string,
+  token: string,
+): Promise<Response> {
+  return fetch(
+    `${backendUrl}${url}`,
+    {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'pragma': 'no-cache',
+        'cache-control': 'no-cache',
+      }
+    }
+  )
+}
 
 async function fetchQueueState(token:string): Promise<Queue> {
-  const queueData = await fetch(
-    `${backendUrl}/api/v1/queue/status`,
-    {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'pragma': 'no-cache',
-        'cache-control': 'no-cache',
-      }
-    }
-  )
-  const passData = await fetch(
-    `${backendUrl}/api/v1/pass`,
-    {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'pragma': 'no-cache',
-        'cache-control': 'no-cache',
-      }
-    }
-  )
-
+  const queueData = await getBackendData('/api/v1/queue/status', token);
+  const passData = await getBackendData('/api/v1/pass', token);
   const queueStatus: ServerQueueStatus = await queueData.json()
 
 
@@ -85,6 +85,7 @@ function Home({ initialServers }: InferGetServerSidePropsType<typeof getStaticPr
   const [token, setToken] = useState('');
   const [servers, setServers] = useState<Server[]>(initialServers)
   const [queue, setQueue] = useState<Queue>()
+  const [profile, setProfile] = useState<UserProfile>()
 
   useEffect(() => {
     setToken(window.location.hash.split('#token=').pop()!)
@@ -155,6 +156,16 @@ function Home({ initialServers }: InferGetServerSidePropsType<typeof getStaticPr
     })
   }, [token])
 
+  useEffect(() => {
+    if (token == '') return
+
+    const load = async () => {
+      const profileData = await getBackendData('/api/v1/auth/profile', token);
+      setProfile(await profileData.json())
+    }
+    load()
+  }, [token]);
+
   return (
     <Container fluid>
       <Head>
@@ -163,6 +174,8 @@ function Home({ initialServers }: InferGetServerSidePropsType<typeof getStaticPr
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
+
+      <CommonNavBar isAdmin={profile != null && hasFlag(profile, AdminFlag.R_ADMIN) && hasFlag(profile, AdminFlag.R_SERVER)} token={token}/>
 
       <Container fluid>
         <Row xs={1} md={2} lg={3}>
