@@ -1491,6 +1491,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/request-ip@npm:^0.0.37":
+  version: 0.0.37
+  resolution: "@types/request-ip@npm:0.0.37"
+  dependencies:
+    "@types/node": "*"
+  checksum: c84ab9209dfd1dd675b653511dbacd1e24be02162b35f4be78a67b0f14d90e88572de6971786915e8bee9c0612f74301e0e137e8345797a85cbe91af13825d7c
+  languageName: node
+  linkType: hard
+
 "@types/serve-static@npm:*":
   version: 1.13.10
   resolution: "@types/serve-static@npm:1.13.10"
@@ -4672,6 +4681,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"is_js@npm:^0.9.0":
+  version: 0.9.0
+  resolution: "is_js@npm:0.9.0"
+  checksum: bf7f0fc52187eda1ca597da0a20b85c4828b9bca5f08c5f2f6dd64d437384bdc9628674c78cee510f9600050871f7d783738d35dc6f5fe80e2a8848be5fbdce9
+  languageName: node
+  linkType: hard
+
 "isarray@npm:0.0.1":
   version: 0.0.1
   resolution: "isarray@npm:0.0.1"
@@ -6045,6 +6061,7 @@ __metadata:
     "@types/ioredis": ^4.28.5
     "@types/jest": 27.0.3
     "@types/node": 16.11.17
+    "@types/request-ip": ^0.0.37
     "@types/supertest": 2.0.11
     "@types/ws": ^8.2.2
     "@typescript-eslint/eslint-plugin": 5.8.0
@@ -6063,6 +6080,7 @@ __metadata:
     prettier: 2.5.1
     prisma: ^3.7.0
     reflect-metadata: 0.1.13
+    request-ip: ^2.1.3
     rimraf: 3.0.2
     rxjs: 7.4.0
     socket.io: ^4.4.0
@@ -6851,6 +6869,15 @@ __metadata:
   version: 3.2.0
   resolution: "regexpp@npm:3.2.0"
   checksum: a78dc5c7158ad9ddcfe01aa9144f46e192ddbfa7b263895a70a5c6c73edd9ce85faf7c0430e59ac38839e1734e275b9c3de5c57ee3ab6edc0e0b1bdebefccef8
+  languageName: node
+  linkType: hard
+
+"request-ip@npm:^2.1.3":
+  version: 2.1.3
+  resolution: "request-ip@npm:2.1.3"
+  dependencies:
+    is_js: ^0.9.0
+  checksum: 72048c15140a3e6ef3d3198fb4eaecf2bb52bb0677dcf20202345428d866085fb0596d2450a42382c59df5e79e1973b402952b3362b2ad9f7f7ab5ce6f90487f
   languageName: node
   linkType: hard
 

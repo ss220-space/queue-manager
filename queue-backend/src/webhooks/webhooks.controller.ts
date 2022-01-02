@@ -1,5 +1,6 @@
-import { Controller, Post, Param, Body, HttpStatus, HttpException } from '@nestjs/common';
+import { Controller, Post, Param, Body, HttpStatus, HttpException, UseGuards } from '@nestjs/common';
 import { ServerPortDto } from '../common/dto/serverPort.dto';
+import { InternalGuard } from '../common/guards/internal.guard';
 import { StatusDto } from './dto/status.dto';
 import { WebhooksService } from './webhooks.service';
 
@@ -10,6 +11,7 @@ export class WebhooksController {
   ) { }
 
   @Post('status/:serverPort')
+  @UseGuards(InternalGuard)
   async pushStatus(@Param() { serverPort }: ServerPortDto, @Body() body: StatusDto): Promise<string> {
 
     if (! await this.webhookService.pushStatus(serverPort, body)) {

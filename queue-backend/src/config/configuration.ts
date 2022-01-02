@@ -2,6 +2,10 @@ import { randomBytes } from 'crypto';
 
 export default () => ({
   port: parseInt(process.env.PORT, 10) || 3000,
+  internalIPs: process.env.INTERNAL_IPS.split(' ') || [
+    '::1',
+    '127.0.0.1',
+  ],
   redis: {
     url: process.env.REDIS_URL || 'redis://127.0.0.1:6379',
   },

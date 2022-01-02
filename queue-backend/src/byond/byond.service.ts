@@ -19,12 +19,15 @@ export class ByondService {
   private readonly redis: IORedis.Redis;
 
   async fetchStatus(serverPort: string): Promise<any> {
-    const server = servers[serverPort];
+    const server = { ... servers[serverPort] };
     const key = server.comms_password ? `&key=${server.comms_password}` : null
-    server.topic = `${server.topic}${key}`
 
     try {
-      const queryByond = await fetchByond(server)
+      const queryByond = await fetchByond({
+        ip: server.ip,
+        port: server.port,
+        topic: `${server.topic}${key}`,
+      })
 
       switch (server.format) {
         case 'json':
@@ -40,13 +43,16 @@ export class ByondService {
     }
   };
 
-  async getPlayerlistExt(id: string): Promise<any> {
-    const server = { ...servers[id] }
+  async getPlayerlistExt(serverPort: string): Promise<any> {
+    const server = { ...servers[serverPort] }
     const key = server.comms_password ? `&key=${server.comms_password}` : null
-    server.topic = `?playerlist_ext${key}`
 
     try {
-      const queryByond = await fetchByond(server)
+      const queryByond = await fetchByond({
+        ip: server.ip,
+        port: server.port,
+        topic: `?playerlist_ext${key}`,
+      })
 
       switch (server.format) {
         case 'json':
@@ -57,7 +63,7 @@ export class ByondService {
           return null
       }
     } catch (err) {
-      this.logger.error(`Failed to getStatus with id ${id}\n${err}`);
+      this.logger.error(`Failed to getStatus with id ${serverPort}\n${err}`);
       return null
     }
   }
@@ -65,18 +71,19 @@ export class ByondService {
   @Interval(20000)
   async handleUpdateByondStatus(): Promise<void> {
     this.logger.debug('handleUpdateByondStatus Called (every 20 seconds)');
-    Object.keys(servers)
+    await Promise.all(Object.keys(servers)
       ?.map(serverPort => {
         return [this.fetchStatus(serverPort), serverPort]
       })
-      ?.forEach(async ([status, serverPort]) => {
+      ?.map(async ([status, serverPort]) => {
         if (!status) 
           return
         const fetchedStatus = await status;
         if (!fetchedStatus)
           return
         await this.redis.set(`byond_${serverPort}_status`, JSON.stringify(fetchedStatus))
-      })
+      }),
+    )
     this.eventEmitter.emit(InternalEvent.ByondStatusUpdate)
   }
 

@@ -18,6 +18,7 @@ import { RequestUserDto } from '@/src/common/dto/requestUser.dto';
 import { AdminFlag } from '../roles/adminFlag.enum';
 import { IpLinkService } from '../ipLink/ipLink.service';
 import { PassService } from '../pass/pass.service';
+import { RealIp } from '../common/decorators/real-ip.decorator';
 
 @Controller('servers')
 export class ServersController {
@@ -45,7 +46,7 @@ export class ServersController {
 
   @UseGuards(JwtAuthGuard)
   @Sse('status-events')
-  async statusEvents(@Request() {user: {ckey, adminFlags}}: RequestUserDto, @Ip() ip: string): Promise<Observable<MessageEvent>> {
+  async statusEvents(@Request() {user: {ckey, adminFlags}}: RequestUserDto, @RealIp() ip: string): Promise<Observable<MessageEvent>> {
     await this.ipLinkService.linkIp(ckey, ip)
     if ((adminFlags & (AdminFlag.R_MENTOR | AdminFlag.R_MOD | AdminFlag.R_ADMIN)) !== 0) {
       this.passService.addPassesForCkey(ckey)

@@ -19,6 +19,8 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
   imports: [
     ConfigModule.forRoot({
       load: [configuration],
+      cache: true,
+      isGlobal: true,
     }),
     RedisModule.forRootAsync({
       imports: [ConfigModule],
