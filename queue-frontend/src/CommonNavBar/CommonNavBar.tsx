@@ -7,7 +7,7 @@ export type CommonNavBarProps = {
 }
 
 export function CommonNavBar({token, isAdmin}: CommonNavBarProps) {
-  return (<Navbar bg="dark" variant="dark">
+  return (<Navbar className="common-nav" variant="dark">
     <Container className="m-0">
       <Navbar.Brand href={`/#token=${token}`}>
         SS220
