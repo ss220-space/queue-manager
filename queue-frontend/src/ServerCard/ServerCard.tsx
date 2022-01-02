@@ -6,13 +6,13 @@ const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL
 
 export const DescItem = (title: string, data: string) => {
   return (
-    <Stack>
-      <h6>
+    <Stack className='mt-3'>
+      <p className="fs-6 text-muted fw-normal mb-0">
         {title}
-      </h6>
-      <h3>
+      </p>
+      <p className="fs-3 fw-bold mb-0">
         {data}
-      </h3>
+      </p>
     </Stack>
   )
 }
@@ -122,9 +122,9 @@ export default function ServerCard(server: Server, token: string, queueLoaded: b
 
   return (
     <Card>
-      <Card.Body>
-        <Card.Title>{server.name}</Card.Title>
+      <Card.Body className="p-1">
         <Container>
+          <Card.Title className="h5 fw-normal mb-0 mt-3">{server.name}</Card.Title>
           <Row>
             <Col>
               {DescItem("Слотов", `${server.status?.slots?.occupied || 0} / ${server.status?.slots?.max || '∞'}`)}
@@ -145,7 +145,7 @@ export default function ServerCard(server: Server, token: string, queueLoaded: b
           </Row>
 
         </Container>
-        <div className="d-grid col-6 mx-auto">
+        <div className="d-grid col-6 mx-auto m-4 mt-3">
           {playButton()}
         </div>
       </Card.Body>
