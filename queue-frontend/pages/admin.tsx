@@ -2,7 +2,7 @@ import { InferGetServerSidePropsType } from 'next'
 import { useEffect, useState } from 'react'
 import { Server } from '../src/ServerCard/ServerCard'
 import { EventSourcePolyfill } from 'event-source-polyfill'
-import { Col, Container, Row, Tab, Table, Tabs } from 'react-bootstrap'
+import { Col, Container, Nav, Row, Tab, Table} from 'react-bootstrap'
 import Head from 'next/head'
 import { CommonNavBar } from '../src/CommonNavBar/CommonNavBar'
 
@@ -54,7 +54,7 @@ function QueueTable({ queue }: { queue: { players: string[] } }) {
       <h2>
         Очередь
       </h2>
-      <Table striped bordered hover>
+      <Table striped bordered hover variant="dark">
         <thead>
           <tr>
             <th>#</th>
@@ -79,13 +79,21 @@ function QueueTable({ queue }: { queue: { players: string[] } }) {
 type PlayerListProps = {
   playerList: { players: PlayerData[] }
 }
+
+function stateIcon(state: boolean) {
+  if (state)
+    return <i className="bi bi-check-circle state-icon"/>
+  else
+    return <i className="bi bi-x-circle state-icon"/>
+}
+
 function PlayerList({playerList}: PlayerListProps) {
   return (
     <Col>
       <h2>
         Игроки
       </h2>
-      <Table striped bordered hover>
+      <Table striped bordered hover variant="dark">
         <thead>
           <tr>
             <th>#</th>
@@ -101,9 +109,9 @@ function PlayerList({playerList}: PlayerListProps) {
             <tr key={index}>
               <td>{index + 1}</td>
               <td>{value.ckey}</td>
-              <td>{value.playing ? "✔️" : "❌"}</td>
-              <td>{value.pass ? "✔️" : "❌"}</td>
-              <td>{value.new ? "✔️" : "❌"}</td>
+              <td>{stateIcon(value.playing)}</td>
+              <td>{stateIcon(value.pass)}</td>
+              <td>{stateIcon(value.new)}</td>
             </tr>
           ))
         }
@@ -167,10 +175,11 @@ function Admin({ initialServers: servers }: InferGetServerSidePropsType<typeof g
     }
   }, [token])
 
+  const queuedSevers = servers.filter((server) => server.queued)
 
 
   return (
-    <Container fluid>
+    <Container className="p-0" fluid>
       <Head>
         <title>SS220</title>
         <meta name="description" content="SS220 Queue Engine Admin" />
@@ -180,19 +189,35 @@ function Admin({ initialServers: servers }: InferGetServerSidePropsType<typeof g
 
       <CommonNavBar isAdmin={true} token={token}/>
 
-      <Tabs>
-
-        {servers.filter(server => server.queued).map(server => (
-          <Tab title={server.name} key={server.port} eventKey={server.port}>
-            <Container>
-              <Row>
-                <QueueTable queue={queuesState[server.port]}/>
-                <PlayerList playerList={playerLists[server.port]}/>
-              </Row>
-            </Container>
-          </Tab>
-        ))}
-      </Tabs>
+      <Container fluid className="p-3">
+        <Tab.Container defaultActiveKey={queuedSevers[0].port}>
+          <Row>
+            <Col sm={3}>
+              <Nav variant="pills" className="flex-column">
+                {
+                  queuedSevers.map(server => <Nav.Link eventKey={server.port} key={server.port}>{server.name}</Nav.Link>)
+                }
+              </Nav>
+            </Col>
+            <Col sm={9}>
+              <Tab.Content>
+                {
+                  queuedSevers.map(server => (
+                    <Tab.Pane eventKey={server.port} key={server.port}>
+                      <Container className="admin-tab p-3">
+                        <Row>
+                          <QueueTable queue={queuesState[server.port]}/>
+                          <PlayerList playerList={playerLists[server.port]}/>
+                        </Row>
+                      </Container>
+                    </Tab.Pane>
+                  ))
+                }
+              </Tab.Content>
+            </Col>
+          </Row>
+        </Tab.Container>
+      </Container>
     </Container>
   )
 }

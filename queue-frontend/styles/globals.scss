@@ -5,7 +5,27 @@ $card-bg: #22252b;
 $primary: #455ddc;
 $success: #43d1a7;
 $text-muted: #727c94;
+$modal-content-bg: $card-bg;
 
 $font-family-base: "Inter";
 
+
+.admin-tab {
+  background-color: $card-bg;
+}
+
 @import "~bootstrap/scss/bootstrap.scss";
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css");
+
+
+.state-icon {
+  font-size: 1.2rem
+}
+
+.bi-check-circle.state-icon {
+  color: $success;
+}
+
+.bi-x-circle.state-icon {
+  color: $danger;
+}

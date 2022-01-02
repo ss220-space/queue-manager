@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { Button, Card, Col, Container, Row, Stack } from 'react-bootstrap'
-import Link from 'next/link'
+import { Fragment, ReactElement } from 'react';
 
 const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL
 
-export const DescItem = (title: string, data: string) => {
+export const DescItem = (title: string, data: ReactElement | string) => {
   return (
     <Stack className='mt-3'>
       <p className="fs-6 text-muted fw-normal mb-0">
@@ -127,7 +127,15 @@ export default function ServerCard(server: Server, token: string, queueLoaded: b
           <Card.Title className="h5 fw-normal mb-0 mt-3">{server.name}</Card.Title>
           <Row>
             <Col>
-              {DescItem("Слотов", `${server.status?.slots?.occupied || 0} / ${server.status?.slots?.max || '∞'}`)}
+              {
+                DescItem("Слотов",
+                  <Fragment>
+                    {server.status?.slots?.occupied || 0}
+                    <span className="fw-normal">&nbsp;/&nbsp;</span>
+                    {server.status?.slots?.max || <i className="bi bi-infinity"/>}
+                  </Fragment>
+                )
+              }
             </Col>
             {
               server.queued && <Col>

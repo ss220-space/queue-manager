@@ -83,7 +83,7 @@ function PassToasts(
   return <ToastContainer className="p-3" position="bottom-end">
     {
       passEvents?.map((event) => (
-        <Toast key={`${event.time}`} onClose={() => { dropEvent(event) }} delay={10000} autohide>
+        <Toast key={`${event.time}`} onClose={() => { dropEvent(event) }} delay={10000} autohide bg="dark">
           <Toast.Header>
             <strong className="me-auto">{servers.find((server) => server.port == event.serverPort)?.name}</strong>
             <small>{moment(event.time).fromNow()}</small>
@@ -202,7 +202,7 @@ function Home({ initialServers }: InferGetServerSidePropsType<typeof getStaticPr
   }, [token]);
 
   return (
-    <Container fluid>
+    <Container className="p-0" fluid>
       <Head>
         <title>SS220</title>
         <meta name="description" content="SS220 Queue Engine" />
