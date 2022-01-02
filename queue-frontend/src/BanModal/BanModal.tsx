@@ -1,11 +1,10 @@
 import { Fragment } from 'react'
 import { Button, Modal } from 'react-bootstrap'
-import Link from 'next/link'
 import useSWR from 'swr'
 import { getBackendData } from '../utils'
 import moment from "moment"
 
-const discordUrl = process.env.NEXT_PUBLIC_BACKEND_URL || ''
+const discordUrl = process.env.NEXT_PUBLIC_DISCORD_URL || ''
 
 export type BanModalProps = {
   token: string
@@ -94,11 +93,9 @@ export function BanModal({token, profile}: BanModalProps) {
           </Modal.Body>
       }
       <Modal.Footer>
-        <Link href={discordUrl} passHref>
-          <Button variant="primary">
-            Discord
-          </Button>
-        </Link>
+        <Button variant="primary" target="_blank" href={discordUrl}>
+          Discord
+        </Button>
       </Modal.Footer>
     </Modal>
   )
