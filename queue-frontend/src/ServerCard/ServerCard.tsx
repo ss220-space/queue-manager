@@ -102,21 +102,21 @@ export default function ServerCard(server: Server, token: string, queueLoaded: b
     }
   }
 
-  function playButton() {
+  function playButton(className: string) {
     if (queue) {
       if (queue.hasPass) {
         return (
-          <Button onClick={handleClick} variant="success">Подключиться</Button>
+          <Button onClick={handleClick} variant="success" className={className}>Подключиться</Button>
         )
       }
       if (queue.position != null) {
         return (
-          <Button onClick={handleClick} variant="primary">{`В очереди (${queue.position+1} из ${queue.total})`}</Button>
+          <Button onClick={handleClick} className={className} variant="primary">{`В очереди (${queue.position+1} из ${queue.total})`}</Button>
         )
       }
     }
     return (
-      <Button disabled={server.queued && !queueLoaded} onClick={handleClick} variant="primary">Играть</Button>
+      <Button disabled={server.queued && !queueLoaded} className={className} onClick={handleClick} variant="primary">Играть</Button>
     )
   }
 
@@ -153,9 +153,9 @@ export default function ServerCard(server: Server, token: string, queueLoaded: b
           </Row>
 
         </Container>
-        <div className="d-grid col-6 mx-auto m-4 mt-3">
-          {playButton()}
-        </div>
+        <Container className="col-6 mx-auto m-4 mt-3">
+          {playButton("col-12")}
+        </Container>
       </Card.Body>
     </Card>
   )
