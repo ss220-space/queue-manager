@@ -8,6 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { PassService } from '../pass/pass.service';
 import { WebhooksService } from '../webhooks/webhooks.service';
 import { ckeySanitize } from '../common/utils'
+import { queuedServerList } from '../config/server-config'
 
 export class PlayerInfoDto {
   time: number
@@ -103,10 +104,8 @@ export class PlayerListService {
   @Interval(10000)
   async handleUpdateByondPlayerlist(): Promise<void> {
     this.logger.debug('handleUpdateByondPlayerlist Called (every 10 seconds)')
-    const playerLists = Object.keys(servers)
-      .filter(serverPort => {
-        return servers[serverPort].queued && servers[serverPort].test
-      })
+    const playerLists = queuedServerList
+      .map((server) => `${server.port}`)
       .map(serverPort => {
         this.logger.debug(`Fetching ${serverPort}`)
         return [this.byondService.getPlayerlistExt(serverPort), serverPort]
@@ -117,47 +116,52 @@ export class PlayerListService {
         return
       }
 
-      let fetchedPlayerlist: string[] = await playerlist;
-      this.logger.debug('fetchedPlayerlist')
-      this.logger.debug(fetchedPlayerlist)
+      let fetchedByondPlayerList: string[] = await playerlist;
+      this.logger.debug('fetchedByondPlayerList')
+      this.logger.debug(fetchedByondPlayerList)
 
-      fetchedPlayerlist = fetchedPlayerlist.map(key => {
+      fetchedByondPlayerList = fetchedByondPlayerList.map(key => {
         return ckeySanitize(key)
       })
 
-      const lastPlayerlist = await this.getPlayerList(<string>serverPort)
-      this.logger.debug('lastPlayerlist')
-      this.logger.debug(lastPlayerlist)
+      const lastPlayerList = await this.getPlayerList(<string>serverPort)
+      this.logger.debug('lastPlayerList')
+      this.logger.debug(lastPlayerList)
 
-      const keyList = Object.keys(lastPlayerlist).length > 0 ? Object.keys(lastPlayerlist) : fetchedPlayerlist
-      const newEntries = {}
+      const keyList = Object.keys(lastPlayerList).length > 0 ? Object.keys(lastPlayerList) : fetchedByondPlayerList
+      const updatedPlayerList = {}
 
       if (keyList) {
         for (const key of keyList) {
           const ckey = ckeySanitize(key)
           this.logger.debug(`Next player is ${ckey}`)
-          if (!fetchedPlayerlist?.includes(ckey)) {
-            const fiveMinutesAgo = Date.now() - this.configService.get<number>('queue.ghost_away_threshold')
-            if (lastPlayerlist[ckey]?.time < fiveMinutesAgo) {
-              await this.removePlayer(<string>serverPort, ckey)
-              continue
-            } else {
-              newEntries[ckey] = lastPlayerlist[ckey]
-            }
-            continue
-          }
 
-          newEntries[ckey] = {
-            time: Date.now(),
+          // If player present in server player list
+          if (fetchedByondPlayerList?.includes(ckey)) {
+            // player was not on player list before, but have access, add pass anyway
+            if (!lastPlayerList[ckey]) {
+              await this.passService.addPassForCkey(ckey, <string>serverPort)
+            }
+
+            updatedPlayerList[ckey] = {
+              time: Date.now(),
+            }
+          } else {
+            const lastPresenceTime = lastPlayerList[ckey]?.time
+            const allowedAwayTime = this.configService.get<number>('queue.ghost_away_threshold')
+            if (Date.now() - lastPresenceTime > allowedAwayTime) {
+              await this.removePlayer(<string>serverPort, ckey)
+            } else {
+              updatedPlayerList[ckey] = lastPlayerList[ckey]
+            }
           }
         }
       }
 
-      this.logger.debug('newEntries')
-      this.logger.debug(newEntries)
+      this.logger.debug('updatedPlayerList')
+      this.logger.debug(updatedPlayerList)
 
-      await this.savePlayerList(<string>serverPort, newEntries)
-
+      await this.savePlayerList(<string>serverPort, updatedPlayerList)
     }
 
   }
