@@ -5,7 +5,7 @@ import { PlayerListService } from '../playerList/playerList.service';
 import { WebhooksService } from '../webhooks/webhooks.service';
 import { servers } from '@/queue.config.json';
 import { ServerQueueStatus } from './dto/queueStatus.dto';
-import { EventEmitter2 } from '@nestjs/event-emitter'
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter'
 import { InternalEvent } from '../common/enums/internalEvent.enum'
 import { QueuesState } from '../common/queues-state'
 import { Interval } from '@nestjs/schedule'
@@ -128,5 +128,12 @@ export class QueueService {
     this.logger.log(`User ${newPlayer} got pass to ${serverPort}`)
     await this.playerListService.addFromQueue(serverPort, JSON.parse(newPlayer).ckey)
     return true
+  }
+
+  @OnEvent(InternalEvent.StatusEventsDisconnect)
+  private async onStatusEventsDisconnect(ckey: string) {
+    for (const server of queuedServerList) {
+      await this.removeFromQueue(`${server.port}`, ckey)
+    }
   }
 }
