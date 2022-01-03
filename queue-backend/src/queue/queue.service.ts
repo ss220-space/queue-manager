@@ -84,13 +84,17 @@ export class QueueService {
     return await this.redis.llen(`byond_queue_${serverPort}`) || 0
   }
 
-  @Interval(10000)
+  @Interval(1000)
   async processQueues(): Promise<void> {
+    // this.logger.debug('processQueues Called (every 1 seconds)')
     let hasChanges = false
     for (const [serverPort, server] of Object.entries(servers)) {
       if (!server.queued) continue
       if (!(server as any).test) continue
-      hasChanges = hasChanges || await this.processQueue(serverPort)
+      for (let i = 0; i < 5; i++) {
+        hasChanges = hasChanges || await this.processQueue(serverPort)
+        if (!hasChanges) break
+      }
     }
     if (hasChanges) {
       await this.notifyQueuesUpdate()
