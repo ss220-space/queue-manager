@@ -32,6 +32,7 @@
     "@nestjs/websockets": "^8.2.4",
     "@prisma/client": "3.7.0",
     "@types/ioredis": "^4.28.5",
+    "async-mutex": "^0.3.2",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.13.2",
     "dotenv": "10.0.0",
