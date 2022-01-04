@@ -2,6 +2,9 @@ var/global/http_log = "data/logs/http.log"
 var/global/log_end = ""
 var/global/datum/http_system/SShttp
 
+/world
+    name = WORLD_NAME
+
 /world/New()
     . = ..()
     SShttp = new
