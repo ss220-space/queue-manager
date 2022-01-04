@@ -7,7 +7,6 @@ import { Queue, Server } from '../src/ServerCard/ServerCard'
 import { EventSourcePolyfill } from 'event-source-polyfill'
 import { CommonNavBar } from '../src/CommonNavBar/CommonNavBar'
 import { AdminFlag, hasFlag } from '../src/adminFlag.enum'
-
 import { BanModal } from '@/src/BanModal/BanModal'
 import { backendUrl, requestBackendData } from '../src/utils'
 import moment from 'moment'
@@ -135,7 +134,6 @@ function Home({ initialServers, renderDate }: InferGetServerSidePropsType<typeof
           'cache-control': 'no-cache',
         }
       }
-
     );
     eventSource.addEventListener('StatusEvent', ({ data }: any) => {
       setServers(JSON.parse(data))
@@ -181,8 +179,8 @@ function Home({ initialServers, renderDate }: InferGetServerSidePropsType<typeof
           }
           if (!prevPasses.has(port)) {
             const audio = new Audio("bikehorn.mp3")
-            audio.addEventListener("canplaythrough", () => {
-              audio.play()
+            audio.addEventListener("canplaythrough", async () => {
+              await audio.play()
             })
             setPassEvents(
               (events) =>
@@ -204,6 +202,10 @@ function Home({ initialServers, renderDate }: InferGetServerSidePropsType<typeof
     eventSource.onerror = (event => {
       console.log(event)
     })
+
+    return () => {
+      eventSource.close()
+    }
   }, [token])
 
   useEffect(() => {

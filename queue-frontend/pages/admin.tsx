@@ -206,6 +206,10 @@ function Admin({ initialServers: servers }: InferGetServerSidePropsType<typeof g
     eventSource.onerror = (event) => {
       console.log(event)
     }
+
+    return () => {
+      eventSource.close()
+    }
   }, [token])
 
   const queuedSevers = servers.filter((server) => server.queued)
