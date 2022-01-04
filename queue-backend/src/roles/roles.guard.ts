@@ -12,7 +12,6 @@ export class RolesGuard implements CanActivate {
       context.getHandler(),
       context.getClass(),
     ]);
-    console.log(requiredRoles)
     if (!requiredRoles) {
       return true;
     }
@@ -21,7 +20,6 @@ export class RolesGuard implements CanActivate {
   }
 
   hasFlag(flags: number, requiredFlag: AdminFlag): boolean {
-    console.log(`Flags ${flags} and required ${requiredFlag}`)
     return (flags & requiredFlag) !== 0
   }
 }

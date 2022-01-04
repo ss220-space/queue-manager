@@ -1,4 +1,4 @@
-import { Injectable, MessageEvent } from '@nestjs/common';
+import { Injectable, Logger, MessageEvent } from '@nestjs/common';
 import {Subject} from 'rxjs';
 import { ServerStatus } from '../servers/dto/serverStatus.dto';
 import { ServerPassUpdate, ServerQueueStatus } from '../queue/dto/queueStatus.dto'
@@ -89,6 +89,8 @@ export class StatusEventsService {
     [ckey: string]: ClientConnectionCounter
   } = {}
 
+  private logger = new Logger(StatusEventsService.name)
+
   onStatusUpdate(data: ServerStatus[]): void {
     const allStatus = new StatusEvent()
     allStatus.data = data
@@ -114,7 +116,7 @@ export class StatusEventsService {
     if (!this.clientConnections[ckey]) {
       this.clientConnections[ckey] = new ClientConnectionCounter(
         () => {
-          console.log(`Client disconnect sent ${ckey}`)
+          this.logger.verbose( `[${ckey}] Disconnected from status`)
           this.eventEmitter.emit(InternalEvent.StatusEventsDisconnect, ckey)
           delete this.clientConnections[ckey]
         },

@@ -20,14 +20,14 @@ export class PassService {
 
   async addPassForCkey(ckey: string, serverPort: string): Promise<void> {
     if (!await this.redis.sadd(`passes_${serverPort}`, ckey)) {
-      this.logger.warn(`player '${ckey}' already has pass to ${serverPort}`)
+      this.logger.warn(`[${ckey}] Already has pass to ${serverPort}`)
       return
     }
     if (!await this.redis.sadd(`pass:${ckey}`, serverPort)) {
-      this.logger.warn(`player '${ckey}' has mismatch in passes for ${serverPort}`)
+      this.logger.warn(`[${ckey}] Has mismatch in passes for ${serverPort}`)
       return
     }
-    this.logger.debug(`Added pass for ${ckey} to ${serverPort}`)
+    this.logger.log(`[${ckey}] Added pass to ${serverPort}`)
 
     await this.notifyPassUpdate(ckey)
     this.eventEmitter.emit(InternalEvent.PassAdded, { ckey, serverPort })
@@ -62,7 +62,7 @@ export class PassService {
   async removeCKeyPass(ckey: string, serverPort: string): Promise<void> {
     await this.redis.srem(`passes_${serverPort}`, ckey)
     await this.redis.srem(`pass:${ckey}`, serverPort)
-    this.logger.debug(`Removed pass for ${ckey} to ${serverPort}`)
+    this.logger.log(`[${ckey}] Removed pass to ${serverPort}`)
 
     await this.notifyPassUpdate(ckey)
     this.eventEmitter.emit(InternalEvent.PassRemoved, { ckey, serverPort })

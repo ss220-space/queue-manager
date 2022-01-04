@@ -48,7 +48,7 @@ export class IptablesEventsService {
 
   async getIpPasses(serverPort: string): Promise<string[]> {
     const passes = await this.provideIpPassesFor(serverPort)
-    this.logger.log(passes)
+    this.logger.debug(passes)
     return Object.keys(passes)
   }
 

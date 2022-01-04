@@ -79,6 +79,7 @@ export class PlayerListService {
   }
 
   private async removePlayer(serverPort: string, ckey: string): Promise<void> {
+    this.logger.log(`[${ckey}] Removed from playerList of ${serverPort}`)
     await this.passService.removeCKeyPass(ckey, serverPort)
   }
 
@@ -149,6 +150,7 @@ export class PlayerListService {
             if (fetchedByondPlayerList?.includes(ckey)) {
               // player was not on player list before, but have access, add pass anyway
               if (!lastPlayerList[ckey]) {
+                this.logger.log(`[${ckey}] New in playerList of ${serverPort}`)
                 await this.passService.addPassForCkey(ckey, <string>serverPort)
               }
 

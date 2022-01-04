@@ -37,7 +37,7 @@ export class IptablesEventsGateway {
 
   @SubscribeMessage('iptables')
   handleEvent(@MessageBody() data: IptablesInitRequestDto): Observable<WsResponse<any>> {
-    this.logger.error(`iptables-control-daemon connected for ports: [${data.ports}]`);
+    this.logger.log(`iptables-control-daemon connected for ports: [${data.ports}]`);
     const initial = (async () => {
       const message = new IptablesInitialMessageDto()
       message.accepts = {}

@@ -39,10 +39,13 @@ export class QueueService {
     }
 
     if (!await this.redis.sadd(`byond_queue_${serverPort}_set`, JSON.stringify(newEntry))) {
+      this.logger.warn(`[${ckey}] Already in queue for ${serverPort}`)
       return false
     }
     await this.redis.rpush(`byond_queue_${serverPort}`, JSON.stringify(newEntry))
     await this.notifyQueuesUpdate()
+    this.logger.log(`[${ckey}] Added to queue for ${serverPort}`)
+
     return true
   }
 
@@ -52,10 +55,14 @@ export class QueueService {
     }
 
     if (!await this.redis.srem(`byond_queue_${serverPort}_set`, JSON.stringify(entry))) {
+      this.logger.warn(`[${ckey}] Not found in queue for ${serverPort}`)
       return false
     }
     await this.redis.lrem(`byond_queue_${serverPort}`, 0, JSON.stringify(entry))
     await this.notifyQueuesUpdate()
+
+    this.logger.log(`[${ckey}] Removed from queue for ${serverPort}`)
+
     return true
   }
 
@@ -72,11 +79,9 @@ export class QueueService {
       const pos = await this.redis.lpos(`byond_queue_${port}`, ckeyEntry)
       const total = await this.redis.llen(`byond_queue_${port}`)
 
-      console.log(pos)
       result.push({position: pos, total, serverPort: `${port}`})
     }
 
-    console.log(result)
     return result
   }
 
@@ -123,10 +128,10 @@ export class QueueService {
     const status = await this.playerListService.getSlotStats(serverPort)
     if (!status) return false
     if (status.occupied >= status.max) return false
-    const newPlayer = await this.redis.lpop(`byond_queue_${serverPort}`)
+    const newPlayer = JSON.parse(await this.redis.lpop(`byond_queue_${serverPort}`))
     await this.redis.srem(`byond_queue_${serverPort}_set`, newPlayer)
-    this.logger.log(`User ${newPlayer} got pass to ${serverPort}`)
-    await this.playerListService.addFromQueue(serverPort, JSON.parse(newPlayer).ckey)
+    this.logger.log(`[${newPlayer.ckey}] Passed queue to ${serverPort}`)
+    await this.playerListService.addFromQueue(serverPort, newPlayer.ckey)
     return true
   }
 
