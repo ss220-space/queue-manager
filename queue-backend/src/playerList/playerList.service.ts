@@ -122,11 +122,11 @@ export class PlayerListService {
         })
 
       for (const [playerlist, serverPort] of playerLists) {
-        if (!playerlist) {
-          return
-        }
-
         let fetchedByondPlayerList: string[] = await playerlist;
+
+        if (!fetchedByondPlayerList) {
+          continue
+        }
         this.logger.debug('fetchedByondPlayerList')
         this.logger.debug(fetchedByondPlayerList)
 
