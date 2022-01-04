@@ -128,7 +128,7 @@ function PlayerList({playerList, revokePass}: PlayerListProps) {
 type ConfirmDialogState = {
   title: string
   message: string
-  onConfirm: () => void
+  onConfirm: () => Promise<void>
 }
 
 function ConfirmDialog(state: ConfirmDialogState | null, onClose: () => void) {
@@ -140,8 +140,8 @@ function ConfirmDialog(state: ConfirmDialogState | null, onClose: () => void) {
       <Modal.Body>{state?.message}</Modal.Body>
       <Modal.Footer>
 
-        <Button variant="primary" onClick={() => {
-          state?.onConfirm()
+        <Button variant="primary" onClick={async () => {
+          await state?.onConfirm()
           onClose()
         }}>
           Выполнить
@@ -251,8 +251,8 @@ function Admin({ initialServers: servers }: InferGetServerSidePropsType<typeof g
                                 {
                                   title: "Отменить пропуск",
                                   message: `Отменить пропуск у игрока ${ckey} на сервер ${server.name}`,
-                                  onConfirm: () => {
-                                    requestBackendData(`/api/v1/pass/revoke/${ckey}/${server.port}`, token, 'POST')
+                                  onConfirm: async () => {
+                                    await requestBackendData(`/api/v1/pass/revoke/${ckey}/${server.port}`, token, 'POST')
                                   }
                                 }
                               )
