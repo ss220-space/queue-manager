@@ -4198,6 +4198,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"helmet@npm:^5.0.1":
+  version: 5.0.1
+  resolution: "helmet@npm:5.0.1"
+  checksum: 6e693ce32a413e967a3f7dc4f12ebcb494b8819b7d9397b2b3c72ac82f75a2ce415b5c6159f7d9717dc646bbf2f3447f63770fc8398efb555b12da1ac8ef53e7
+  languageName: node
+  linkType: hard
+
 "html-encoding-sniffer@npm:^2.0.1":
   version: 2.0.1
   resolution: "html-encoding-sniffer@npm:2.0.1"
@@ -6082,6 +6089,7 @@ __metadata:
     eslint: 8.5.0
     eslint-config-prettier: 8.3.0
     eslint-plugin-import: 2.25.3
+    helmet: ^5.0.1
     jest: 27.4.5
     jspack: ^0.0.4
     nestjs-redis: "git+https://github.com/skunight/nestjs-redis.git"
