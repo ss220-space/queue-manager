@@ -129,7 +129,7 @@ export class QueueService {
     if (!status) return false
     if (status.occupied >= status.max) return false
     const newPlayer = JSON.parse(await this.redis.lpop(`byond_queue_${serverPort}`))
-    await this.redis.srem(`byond_queue_${serverPort}_set`, newPlayer)
+    await this.redis.srem(`byond_queue_${serverPort}_set`, JSON.stringify(newPlayer))
     this.logger.log(`[${newPlayer.ckey}] Passed queue to ${serverPort}`)
     await this.playerListService.addFromQueue(serverPort, newPlayer.ckey)
     return true
