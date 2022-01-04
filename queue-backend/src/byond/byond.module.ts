@@ -7,7 +7,6 @@ import { RedisModule } from 'nestjs-redis';
 @Module({
   imports: [
     PassModule,
-    RedisModule,
   ],
   controllers: [ByondController],
   providers: [ByondService],

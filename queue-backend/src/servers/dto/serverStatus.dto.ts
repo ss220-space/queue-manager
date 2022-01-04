@@ -18,6 +18,7 @@ export class ServerStatus {
       max: number;
       occupied: number;
     };
-    queueSize: number
-  }
+    queueSize: number;
+    date: Date;
+  };
 }

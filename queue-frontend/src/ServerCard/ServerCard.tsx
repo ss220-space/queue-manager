@@ -1,18 +1,29 @@
-import * as React from 'react';
-import { Button, Card, Col, Container, Row, Stack } from 'react-bootstrap'
+import { useState } from 'react'
+import { Button, Card, Col, Container, Row, Stack, Placeholder, Badge } from 'react-bootstrap'
 import { Fragment, ReactElement } from 'react';
 
 const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL
 
-export const DescItem = (title: string, data: ReactElement | string) => {
+const DescItemContent = (data: ReactElement | string) => {
+  return (
+    <p className="fs-3 fw-bold mb-0">
+      {data}
+    </p>
+  )
+}
+
+export const DescItem = (title: string, data: ReactElement | string | undefined | null ) => {
   return (
     <Stack className='mt-3'>
       <p className="fs-6 text-muted fw-normal mb-0">
         {title}
       </p>
-      <p className="fs-3 fw-bold mb-0">
-        {data}
-      </p>
+      { data ?
+        DescItemContent(data) :
+        <Placeholder as="p" size="lg" animation="glow" className="m-0"> 
+          <Placeholder xs={10} className="my-1 py-3"/>
+        </Placeholder>
+      }
     </Stack>
   )
 }
@@ -43,7 +54,8 @@ export type Server = {
       max: number;
       occupied: number;
     };
-    queueSize: number
+    queueSize: number;
+    date: Date;
   }
 }
 
@@ -68,6 +80,8 @@ const getTickerStateString = (tickerState: TickerState) => {
 }
 
 export default function ServerCard(server: Server, token: string, queueLoaded: boolean, queue?: ServerQueue) {
+  const isStale: boolean = server.status! && (Date.now() + 60 * 1000) > server.status.date.valueOf()
+
   async function handleClick() {
     if (server.queued && !queue?.hasPass) {
       const data = {
@@ -111,12 +125,15 @@ export default function ServerCard(server: Server, token: string, queueLoaded: b
       }
       if (queue.position != null) {
         return (
-          <Button onClick={handleClick} className={className} variant="primary">{`В очереди (${queue.position+1} из ${queue.total})`}</Button>
+          <Button onClick={handleClick} className={className} variant="primary">
+            {"В очереди "}
+            <Badge bg="success">{queue.position+1}</Badge>
+          </Button>
         )
       }
     }
     return (
-      <Button disabled={server.queued && !queueLoaded} className={className} onClick={handleClick} variant="primary">Играть</Button>
+      <Button disabled={server.queued && !queueLoaded && !isStale} className={className} onClick={handleClick} variant="primary">Играть</Button>
     )
   }
 
@@ -145,10 +162,10 @@ export default function ServerCard(server: Server, token: string, queueLoaded: b
           </Row>
           <Row>
             <Col>
-              {DescItem("Время раунда", server.status?.roundtime || '??')}
+              {DescItem("Время раунда", !isStale ? server.status?.roundtime : null)}
             </Col>
             <Col>
-              {DescItem("Статус", server.status?.ticker_state ? getTickerStateString(server.status.ticker_state) : '??')}
+              {DescItem("Статус", server.status?.ticker_state ? getTickerStateString(server.status.ticker_state) : null)}
             </Col>
           </Row>
 
