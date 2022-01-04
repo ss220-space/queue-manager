@@ -82,7 +82,7 @@ export class IptablesEventsService {
   private async onRemoveCkeyPass(ckey: string, ip: string, serverPort: string) {
     const serverIpPasses = await this.provideIpPassesFor(serverPort)
     const updatedPasses = serverIpPasses[ip]?.filter((passCkey) => passCkey !== ckey)
-    if (updatedPasses.length == 0) {
+    if (!updatedPasses || updatedPasses.length == 0) {
       delete serverIpPasses[ip]
       this.onRemovedPass(ip, parseInt(serverPort))
     } else {

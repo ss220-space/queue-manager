@@ -2,9 +2,10 @@ import { InferGetServerSidePropsType } from 'next'
 import { useEffect, useState } from 'react'
 import { Server } from '../src/ServerCard/ServerCard'
 import { EventSourcePolyfill } from 'event-source-polyfill'
-import { Col, Container, Nav, Row, Tab, Table} from 'react-bootstrap'
+import { Button, Col, Container, Modal, Nav, Row, Tab, Table } from 'react-bootstrap'
 import Head from 'next/head'
 import { CommonNavBar } from '../src/CommonNavBar/CommonNavBar'
+import { requestBackendData } from '../src/utils'
 
 const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL
 
@@ -78,6 +79,7 @@ function QueueTable({ queue }: { queue: { players: string[] } }) {
 
 type PlayerListProps = {
   playerList: { players: PlayerData[] }
+  revokePass: (ckey: string) => void
 }
 
 function stateIcon(state: boolean) {
@@ -87,7 +89,7 @@ function stateIcon(state: boolean) {
     return <i className="bi bi-x-circle state-icon"/>
 }
 
-function PlayerList({playerList}: PlayerListProps) {
+function PlayerList({playerList, revokePass}: PlayerListProps) {
   return (
     <Col>
       <h2>
@@ -110,7 +112,7 @@ function PlayerList({playerList}: PlayerListProps) {
               <td>{index + 1}</td>
               <td>{value.ckey}</td>
               <td>{stateIcon(value.playing)}</td>
-              <td>{stateIcon(value.pass)}</td>
+              <td><Button disabled={!value.pass} className="p-0 px-1" onClick={() => revokePass(value.ckey)}>{stateIcon(value.pass)}</Button></td>
               <td>{stateIcon(value.new)}</td>
             </tr>
           ))
@@ -121,6 +123,37 @@ function PlayerList({playerList}: PlayerListProps) {
     </Col>
   )
 }
+
+
+type ConfirmDialogState = {
+  title: string
+  message: string
+  onConfirm: () => void
+}
+
+function ConfirmDialog(state: ConfirmDialogState | null, onClose: () => void) {
+  return (
+    <Modal show={state != null} onHide={onClose}>
+      <Modal.Header closeButton>
+        <Modal.Title>{state?.title}</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>{state?.message}</Modal.Body>
+      <Modal.Footer>
+
+        <Button variant="primary" onClick={() => {
+          state?.onConfirm()
+          onClose()
+        }}>
+          Выполнить
+        </Button>
+        <Button variant="secondary" onClick={onClose}>
+          Отмена
+        </Button>
+      </Modal.Footer>
+    </Modal>
+  )
+}
+
 
 function Admin({ initialServers: servers }: InferGetServerSidePropsType<typeof getStaticProps>) {
   const [token, setToken] = useState('');
@@ -177,6 +210,7 @@ function Admin({ initialServers: servers }: InferGetServerSidePropsType<typeof g
 
   const queuedSevers = servers.filter((server) => server.queued)
 
+  const [confirmState, setConfirmState] = useState<ConfirmDialogState | null>(null)
 
   return (
     <Container className="p-0" fluid>
@@ -189,6 +223,9 @@ function Admin({ initialServers: servers }: InferGetServerSidePropsType<typeof g
 
       <CommonNavBar isAdmin={true} token={token}/>
 
+      {
+        ConfirmDialog(confirmState, () => { setConfirmState(null) })
+      }
       <Container fluid className="p-3">
         <Tab.Container defaultActiveKey={queuedSevers[0].port}>
           <Row>
@@ -207,7 +244,20 @@ function Admin({ initialServers: servers }: InferGetServerSidePropsType<typeof g
                       <Container className="admin-tab p-3">
                         <Row>
                           <QueueTable queue={queuesState[server.port]}/>
-                          <PlayerList playerList={playerLists[server.port]}/>
+                          <PlayerList
+                            playerList={playerLists[server.port]}
+                            revokePass={(ckey) => {
+                              setConfirmState(
+                                {
+                                  title: "Отменить пропуск",
+                                  message: `Отменить пропуск у игрока ${ckey} на сервер ${server.name}`,
+                                  onConfirm: () => {
+                                    requestBackendData(`/api/v1/pass/${ckey}/${server.port}`, token, 'DELETE')
+                                  }
+                                }
+                              )
+                            }}
+                          />
                         </Row>
                       </Container>
                     </Tab.Pane>
