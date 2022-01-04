@@ -6,11 +6,19 @@ import { ConfigService } from '@nestjs/config';
 import helmet from 'helmet'
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const isDev = process.env.NODE_ENV == 'development'
+
+  const logger = []
+  if (isDev) {
+    logger.push('log', 'error', 'warn', 'verbose', 'debug')
+  } else {
+    logger.push('log', 'error', 'warn')
+  }
+
+  const app = await NestFactory.create(AppModule, { logger });
 
   app.use(helmet())
   const configService = app.get(ConfigService);
-  const isDev = configService.get<string>('NODE_ENV') == 'development'
   if (isDev) {
     console.log('Running in dev, enabled CORS')
     app.enableCors()
