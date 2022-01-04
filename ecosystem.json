@@ -4,7 +4,7 @@
       "name": "queue-backend",
       "cwd": "./queue-backend/",
       "script": "node",
-      "args": "dist/main",
+      "args": "./dist/src/main",
       "env": {
         "NODE_ENV": "production"
       }
@@ -12,7 +12,7 @@
     {
       "name": "queue-frontend",
       "cwd": "./queue-frontend/",
-      "script": "next",
+      "script": "yarn next",
       "args": "start",
       "log_date_format": "DD-MM-YYYY HH:mm:ss Z",
       "env": {
