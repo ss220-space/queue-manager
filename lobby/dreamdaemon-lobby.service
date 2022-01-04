@@ -1,0 +1,36 @@
+[Unit]
+Description=DreamDaemon service for Lobby
+Documentation=man:DreamDaemon
+After=network.target
+
+[Service]
+Type=simple
+
+User=byond
+Group=byond
+
+WorkingDirectory=/var/lib/queue.ss220.space/lobby
+
+Nice=-10
+
+ExecStart=DreamDaemon lobby.dmb 7700 -invisible -core
+KillMode=control-group
+Restart=always
+RestartSec=3s
+
+; Use private /tmp and /var/tmp, which are discarded after it stops.
+PrivateTmp=true
+
+; Use a minimal /dev (May bring additional security if switched to 'true', but it may not work on Raspberry Pi's or other devices, so it has been disabled in this dist.)
+PrivateDevices=true
+
+; Hide /home, /root, and /run/user. Nobody will steal your SSH-keys.
+ProtectHome=true
+
+; Make /usr, /boot, /etc and possibly some more folders read-only.
+ProtectSystem=full
+
+ReadWriteDirectories=/var/lib/queue.ss220.space/lobby
+
+[Install]
+WantedBy=multi-user.target
