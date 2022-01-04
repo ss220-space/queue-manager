@@ -1,0 +1,22 @@
+{
+  "apps": [
+    {
+      "name": "queue-backend",
+      "script": "node",
+      "args": "dist/main",
+      "env": {
+        "NODE_ENV": "production"
+      }
+    },
+    {
+      "name": "queue-frontend",
+      "script": "next",
+      "args": "start",
+      "log_date_format": "DD-MM-YYYY HH:mm:ss Z",
+      "env": {
+        "PORT": "6001",
+        "NODE_ENV": "production"
+      }
+    }
+  ]
+}
