@@ -1,0 +1,35 @@
+[Unit]
+Description=Iptables Control Daemon
+After=network.target
+
+[Service]
+Type=simple
+
+User=root
+Group=root
+
+WorkingDirectory=/var/lib/queue.ss220.space/iptables-control-daemon
+
+Nice=-10
+
+ExecStart=/var/lib/queue.ss220.space/iptables-control-daemon/target/release/iptables-control-daemon
+KillMode=control-group
+Restart=always
+RestartSec=3s
+
+; Use private /tmp and /var/tmp, which are discarded after it stops.
+PrivateTmp=true
+
+; Use a minimal /dev (May bring additional security if switched to 'true', but it may not work on Raspberry Pi's or other devices, so it has been disabled in this dist.)
+PrivateDevices=true
+
+; Hide /home, /root, and /run/user. Nobody will steal your SSH-keys.
+ProtectHome=true
+
+; Make /usr, /boot, /etc and possibly some more folders read-only.
+ProtectSystem=full
+
+ReadWriteDirectories=/var/lib/queue.ss220.space/iptables-control-daemon
+
+[Install]
+WantedBy=multi-user.target
