@@ -12,8 +12,8 @@
     {
       "name": "queue-frontend",
       "cwd": "./queue-frontend/",
-      "script": "yarn next",
-      "args": "start",
+      "script": "yarn start",
+      "args": "",
       "log_date_format": "DD-MM-YYYY HH:mm:ss Z",
       "env": {
         "PORT": "6001",

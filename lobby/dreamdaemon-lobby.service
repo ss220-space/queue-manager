@@ -13,7 +13,7 @@ WorkingDirectory=/var/lib/queue.ss220.space/lobby
 
 Nice=-10
 
-ExecStart=DreamDaemon lobby.dmb 7700 -invisible -core
+ExecStart=DreamDaemon lobby.dmb 7700 -trusted -invisible -core
 KillMode=control-group
 Restart=always
 RestartSec=3s
