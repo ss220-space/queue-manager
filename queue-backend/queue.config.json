@@ -48,7 +48,7 @@
     },
     "7724": {
       "name": "Paradise Extended eXperimental",
-      "ip": "ex.ss220.space",
+      "ip": "10.222.2.12",
       "port": 7724,
       "topic": "?status",
       "format": "json",
