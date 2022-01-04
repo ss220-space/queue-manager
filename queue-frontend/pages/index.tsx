@@ -39,6 +39,7 @@ export async function getStaticProps() {
   return {
     props: {
       initialServers: servers,
+      renderDate: Date.now()
     },
     revalidate: 10, // In seconds
   }
@@ -95,7 +96,7 @@ function PassToasts(
   </ToastContainer>
 }
 
-function Home({ initialServers }: InferGetServerSidePropsType<typeof getStaticProps>) {
+function Home({ initialServers, renderDate }: InferGetServerSidePropsType<typeof getStaticProps>) {
   const [token, setToken] = useState('');
   const [servers, setServers] = useState<Server[]>(initialServers)
   const [queue, setQueue] = useState<Queue>()
@@ -105,6 +106,17 @@ function Home({ initialServers }: InferGetServerSidePropsType<typeof getStaticPr
   useEffect(() => {
     setToken(window.location.hash.split('#token=').pop()!)
   }, [])
+
+  useEffect(() => {
+    if (renderDate > Date.now() - 10 * 1000) return
+    const load = async () => {
+      const res = await fetch(`${backendUrl}/api/v1/servers/status`, {
+        cache: 'no-cache',
+      })
+      setServers(await res.json())
+    }
+    load()
+  })
 
   useEffect(() => {
     if (token == '') return
