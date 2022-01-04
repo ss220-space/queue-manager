@@ -8,7 +8,7 @@ export class ByondService {
 
   async fetchStatus(serverPort: string): Promise<any> {
     const server = { ... servers[serverPort] };
-    const key = server.comms_password ? `&key=${server.comms_password}` : null
+    const key = server.comms_password ? `&key=${server.comms_password}` : ''
 
     try {
       const queryByond = await fetchByond({
@@ -33,7 +33,7 @@ export class ByondService {
 
   async getPlayerlistExt(serverPort: string): Promise<any> {
     const server = { ...servers[serverPort] }
-    const key = server.comms_password ? `&key=${server.comms_password}` : null
+    const key = server.comms_password ? `&key=${server.comms_password}` : ''
 
     try {
       const queryByond = await fetchByond({
@@ -51,7 +51,7 @@ export class ByondService {
           return null
       }
     } catch (err) {
-      this.logger.error(`Failed to getStatus with id ${serverPort}\n${err}`);
+      this.logger.error(`Failed to getPlayerlistExt with id ${serverPort}\n${err}`);
       return null
     }
   }
