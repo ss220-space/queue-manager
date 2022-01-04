@@ -116,7 +116,7 @@ function Home({ initialServers, renderDate }: InferGetServerSidePropsType<typeof
       setServers(await res.json())
     }
     load()
-  })
+  }, [renderDate])
 
   useEffect(() => {
     if (token == '') return
