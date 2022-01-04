@@ -13,8 +13,14 @@ export class RequestLoggingMiddleware implements NestMiddleware {
       const { statusCode } = response;
       const contentLength = response.get('content-length');
 
+      const user = (request as any).user
+      let userStr = ''
+      if (user) {
+        userStr = `ckey: '${user.ckey}', adminFlags: ${user.adminFlags}, ban: ${user.hasActiveBan}`
+      }
+
       this.logger.log(
-        `${method} ${originalUrl} ${statusCode} ${contentLength} - ${userAgent} ${ip}`,
+        `${method} ${originalUrl} ${statusCode} ${contentLength} - ${userAgent} ${ip} ${userStr}`,
       );
     });
 
