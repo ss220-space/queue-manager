@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, Param, Request, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Post, Request, UseGuards } from '@nestjs/common';
 import { RequestUserDto } from '../common/dto/requestUser.dto'
 import { PassService } from './pass.service'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
@@ -20,7 +20,7 @@ export class PassController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(AdminFlag.R_ADMIN, AdminFlag.R_SERVER)
-  @Delete('/:ckey/:serverPort')
+  @Post('/revoke/:ckey/:serverPort')
   async removePass(@Param() { ckey }, @Param() { serverPort }: ServerPortDto) {
     return await this.passService.removeCKeyPass(ckey, serverPort)
   }

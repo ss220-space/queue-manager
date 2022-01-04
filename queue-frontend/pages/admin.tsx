@@ -252,7 +252,7 @@ function Admin({ initialServers: servers }: InferGetServerSidePropsType<typeof g
                                   title: "Отменить пропуск",
                                   message: `Отменить пропуск у игрока ${ckey} на сервер ${server.name}`,
                                   onConfirm: () => {
-                                    requestBackendData(`/api/v1/pass/${ckey}/${server.port}`, token, 'DELETE')
+                                    requestBackendData(`/api/v1/pass/revoke/${ckey}/${server.port}`, token, 'POST')
                                   }
                                 }
                               )
