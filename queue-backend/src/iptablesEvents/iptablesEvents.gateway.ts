@@ -26,7 +26,7 @@ export class IptablesEventMessageDto {
   target_port: number
 }
 
-@WebSocketGateway()
+@WebSocketGateway({ path: '/iptables' })
 export class IptablesEventsGateway {
   constructor(
     private readonly eventService: IptablesEventsService,
