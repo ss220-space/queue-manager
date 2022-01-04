@@ -1,7 +1,7 @@
 import { Fragment } from 'react'
 import { Button, Modal } from 'react-bootstrap'
 import useSWR from 'swr'
-import { getBackendData } from '../utils'
+import { requestBackendData } from '../utils'
 import moment from "moment"
 
 const discordUrl = process.env.NEXT_PUBLIC_DISCORD_URL || ''
@@ -79,7 +79,7 @@ function banMessage(ban: BanInfo) {
 }
 
 export function BanModal({token, profile}: BanModalProps) {
-  const { data: ban } = useSWR<BanInfo>(profile && profile.hasActiveBan ? `/api/v1/users/ban` : null, async (url) => await (await getBackendData(url, token)).json())
+  const { data: ban } = useSWR<BanInfo>(profile && profile.hasActiveBan ? `/api/v1/users/ban` : null, async (url) => await (await requestBackendData(url, token)).json())
 
 
   return (

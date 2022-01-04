@@ -9,7 +9,7 @@ import { CommonNavBar } from '../src/CommonNavBar/CommonNavBar'
 import { AdminFlag, hasFlag } from '../src/adminFlag.enum'
 
 import { BanModal } from '@/src/BanModal/BanModal'
-import { backendUrl, getBackendData } from '../src/utils'
+import { backendUrl, requestBackendData } from '../src/utils'
 import moment from 'moment'
 
 export type ServerPort = string
@@ -47,8 +47,8 @@ export async function getStaticProps() {
 
 
 async function fetchQueueState(token:string): Promise<Queue> {
-  const queueData = await getBackendData('/api/v1/queue/status', token);
-  const passData = await getBackendData('/api/v1/pass', token);
+  const queueData = await requestBackendData('/api/v1/queue/status', token);
+  const passData = await requestBackendData('/api/v1/pass', token);
   const queueStatus: ServerQueueStatus = await queueData.json()
 
 
@@ -210,7 +210,7 @@ function Home({ initialServers, renderDate }: InferGetServerSidePropsType<typeof
     if (token == '') return
 
     const load = async () => {
-      const profileData = await getBackendData('/api/v1/auth/profile', token);
+      const profileData = await requestBackendData('/api/v1/auth/profile', token);
       setProfile(await profileData.json())
     }
     load()
