@@ -43,7 +43,7 @@ export type Server = {
   port: string;
   queued: boolean;
   status?: {
-    ticker_state: TickerState;
+    ticker_state: number | string | undefined;
     mode: string;
     roundtime: string;
     mapname: string;
@@ -55,7 +55,7 @@ export type Server = {
       occupied: number;
     };
     queueSize: number;
-    date: Date;
+    date: string;
   }
 }
 
@@ -69,9 +69,10 @@ export type ServerQueue = {
   hasPass: boolean
 }
 
-const getTickerStateString = (tickerState: TickerState) => {
-  switch (tickerState) {
-    case TickerState.Startup: return 'Инициализация';
+const getTickerStateString = (tickerState: number | string | undefined) => {
+  const state: TickerState = Number(tickerState)
+  switch (state) {
+    case TickerState.Startup: return 'Загрузка';
     case TickerState.Pregame: return 'Лобби';
     case TickerState.SettingUp: return 'Подготовка';
     case TickerState.Playing: return 'Идёт игра';
@@ -80,7 +81,7 @@ const getTickerStateString = (tickerState: TickerState) => {
 }
 
 export default function ServerCard(server: Server, token: string, queueLoaded: boolean, queue?: ServerQueue) {
-  const isStale: boolean = server.status! && (Date.now() + 60 * 1000) > server.status.date.valueOf()
+  const isStale: boolean = !server.status || Date.parse(server.status.date) < (Date.now() - 60 * 1000) 
 
   async function handleClick() {
     if (server.queued && !queue?.hasPass) {
@@ -133,7 +134,7 @@ export default function ServerCard(server: Server, token: string, queueLoaded: b
       }
     }
     return (
-      <Button disabled={server.queued && !queueLoaded && !isStale} className={className} onClick={handleClick} variant="primary">Играть</Button>
+      <Button disabled={server.queued && (!queueLoaded || isStale)} className={className} onClick={handleClick} variant="primary">Играть</Button>
     )
   }
 
@@ -162,10 +163,10 @@ export default function ServerCard(server: Server, token: string, queueLoaded: b
           </Row>
           <Row>
             <Col>
-              {DescItem("Время раунда", !isStale ? server.status?.roundtime : null)}
+              {DescItem("Время раунда", isStale ? null : server.status?.roundtime)}
             </Col>
             <Col>
-              {DescItem("Статус", server.status?.ticker_state ? getTickerStateString(server.status.ticker_state) : null)}
+              {DescItem("Статус", !isStale ? getTickerStateString(server.status?.ticker_state!) : null)}
             </Col>
           </Row>
 
