@@ -1,7 +1,7 @@
 import ServerCard from '@/src/ServerCard/ServerCard'
 import type { InferGetServerSidePropsType } from 'next'
 import Head from 'next/head'
-import { useEffect, useState } from 'react'
+import { MutableRefObject, useEffect, useRef, useState } from 'react'
 import { Col, Container, Row, Toast, ToastContainer } from 'react-bootstrap'
 import { Queue, Server } from '../src/ServerCard/ServerCard'
 import { EventSourcePolyfill } from 'event-source-polyfill'
@@ -10,6 +10,7 @@ import { AdminFlag, hasFlag } from '../src/adminFlag.enum'
 import { BanModal } from '@/src/BanModal/BanModal'
 import { backendUrl, requestBackendData } from '../src/utils'
 import moment from 'moment'
+import { Set } from 'immutable'
 
 export type ServerPort = string
 
@@ -45,7 +46,7 @@ export async function getStaticProps() {
 }
 
 
-async function fetchQueueState(token:string): Promise<Queue> {
+async function fetchQueueState(token:string, passes: MutableRefObject<Set<string>>): Promise<Queue> {
   const queueData = await requestBackendData('/api/v1/queue/status', token);
   const passData = await requestBackendData('/api/v1/pass', token);
   const queueStatus: ServerQueueStatus = await queueData.json()
@@ -65,6 +66,8 @@ async function fetchQueueState(token:string): Promise<Queue> {
       hasPass: true
     }
   }
+
+  passes.current = Set<string>(passStatus)
   return newQueue
 }
 
@@ -101,6 +104,7 @@ function Home({ initialServers, renderDate }: InferGetServerSidePropsType<typeof
   const [queue, setQueue] = useState<Queue>()
   const [profile, setProfile] = useState<UserProfile>()
   const [passEvents, setPassEvents] = useState<NewPassEvent[]>([])
+  const prevPasses = useRef(Set<string>())
 
   useEffect(() => {
     setToken(window.location.hash.split('#token=').pop()!)
@@ -121,9 +125,11 @@ function Home({ initialServers, renderDate }: InferGetServerSidePropsType<typeof
     if (token == '') return
 
     const load = async () => {
-      setQueue(await fetchQueueState(token))
+      setQueue(await fetchQueueState(token, prevPasses))
     }
     load()
+
+    const audio = new Audio("bikehorn.mp3")
 
     const eventSource = new EventSourcePolyfill (
       `${backendUrl}/api/v1/servers/status-events`,
@@ -159,45 +165,43 @@ function Home({ initialServers, renderDate }: InferGetServerSidePropsType<typeof
         return newQueue
       })
     })
+
+
     eventSource.addEventListener('PassEvent', ({ data }: any) => {
       console.log(data)
+      const update: ServerPassUpdate = JSON.parse(data)
       setQueue((queue) => {
-        const update: ServerPassUpdate = JSON.parse(data)
         const newQueue: Queue = {...queue}
-        const prevPasses = new Set()
+
         for (const port of Object.keys(newQueue)) {
-          if (newQueue[port]?.hasPass === true) {
-            prevPasses.add(port)
-          }
           newQueue[port].hasPass = false
         }
-
 
         for (const port of update) {
           newQueue[port] = {
             hasPass: true
           }
-          if (!prevPasses.has(port)) {
-            const audio = new Audio("bikehorn.mp3")
-            audio.addEventListener("canplaythrough", async () => {
-              await audio.play()
-            })
-            setPassEvents(
-              (events) =>
-                [
-                  ...events,
-                  {
-                    time: new Date(),
-                    serverPort: port,
-                    show: false
-                  }
-                ]
-            )
-          }
         }
-
         return newQueue
       });
+
+      for (const port of update) {
+        if (!prevPasses.current.has(port)) {
+          audio.play()
+          setPassEvents(
+            (events) =>
+              [
+                ...events,
+                {
+                  time: new Date(),
+                  serverPort: port,
+                  show: false
+                }
+              ]
+          )
+        }
+      }
+      prevPasses.current = Set(update)
     })
     eventSource.onerror = (event => {
       console.log(event)
