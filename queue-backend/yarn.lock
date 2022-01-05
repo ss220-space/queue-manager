@@ -4505,6 +4505,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ipaddr.js@npm:^2.0.1":
+  version: 2.0.1
+  resolution: "ipaddr.js@npm:2.0.1"
+  checksum: dd194a394a843d470f88d17191b0948f383ed1c8e320813f850c336a0fcb5e9215d97ec26ca35ab4fbbd31392c8b3467f3e8344628029ed3710b2ff6b5d1034e
+  languageName: node
+  linkType: hard
+
 "is-arrayish@npm:^0.2.1":
   version: 0.2.1
   resolution: "is-arrayish@npm:0.2.1"
@@ -6097,6 +6104,7 @@ __metadata:
     eslint-config-prettier: 8.3.0
     eslint-plugin-import: 2.25.3
     helmet: ^5.0.1
+    ipaddr.js: ^2.0.1
     jest: 27.4.5
     jspack: ^0.0.4
     nestjs-redis: "git+https://github.com/skunight/nestjs-redis.git"

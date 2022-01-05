@@ -37,6 +37,7 @@
     "class-validator": "^0.13.2",
     "dotenv": "10.0.0",
     "helmet": "^5.0.1",
+    "ipaddr.js": "^2.0.1",
     "jspack": "^0.0.4",
     "nestjs-redis": "git+https://github.com/skunight/nestjs-redis.git",
     "passport": "^0.5.2",
