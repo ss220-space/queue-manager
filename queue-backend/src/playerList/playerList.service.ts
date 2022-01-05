@@ -57,7 +57,7 @@ export class PlayerListService {
   }
 
   async getSlotStats(serverPort: string) {
-    const occupied = this.getPlayerCount(serverPort, false, true)
+    const occupied = await this.getPlayerCount(serverPort, false, true)
     return {
       max: servers[serverPort].max,
       occupied,
