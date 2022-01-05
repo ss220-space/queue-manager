@@ -21,6 +21,7 @@ window "default"
 		is-default = true
 		saved-params = "pos;size;is-minimized;is-maximized"
 		statusbar = false
+		icon = 'ss220.logo.64.png'
 		macro = "macro"
 		menu = "menu"
 		outer-size = 1296x779
