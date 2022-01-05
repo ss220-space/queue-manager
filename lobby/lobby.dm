@@ -19,6 +19,8 @@ var/global/datum/http_system/SShttp
 
     var/list/data = new
     data["ckey"] = ckey
+    data["ip"] = address
+    data["targetServer"] = winget(src, null, "url")
 
     var/list/headers = new
     headers["Content-Type"] = "Application/Json"
@@ -28,7 +30,7 @@ var/global/datum/http_system/SShttp
 
     SShttp.create_async_request(
         RUSTG_HTTP_METHOD_POST,
-        "[BACKEND_URL]/api/v1/auth/authorize",
+        "[BACKEND_URL]/api/v1/webhooks/lobby_connect",
         json_encode(data),
         headers,
         cb
@@ -37,9 +39,23 @@ var/global/datum/http_system/SShttp
 
 /client/proc/on_client_authorize(datum/http_response/response)
     world.log << "Response [src] [response.body]"
+    var/list/resp = json_decode(response.body)
 
-    src << browse({"
-        <script>
-            window.location.href = "[FRONTEND_URL]#token=[response.body]"
-        </script>
-    "})
+    if (resp.redirect)
+        src << browse({"
+            <a id='link' href='[resp.redirect]'>
+                LINK
+            </a>
+            <script type='text/javascript'>
+                document.getElementById("link").click();
+                window.location="byond://winset?command=.quit"
+            </script>
+            "},
+            "border=0;titlebar=0;size=1x1"
+        )
+    else 
+        src << browse({"
+            <script>
+                window.location.href = "[FRONTEND_URL]#token=[resp.token]"
+            </script>
+        "})

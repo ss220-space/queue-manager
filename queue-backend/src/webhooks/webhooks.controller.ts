@@ -3,6 +3,7 @@ import { ServerPortDto } from '../common/dto/serverPort.dto';
 import { InternalGuard } from '../common/guards/internal.guard';
 import { StatusDto } from './dto/status.dto';
 import { WebhooksService } from './webhooks.service';
+import { LobbyConnectDto, LobbyConnectResponse } from './dto/lobbyConnect.dto'
 
 @Controller('webhooks')
 export class WebhooksController {
@@ -18,5 +19,11 @@ export class WebhooksController {
       throw new HttpException(`Something gone wild with ${serverPort}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
     return 'success'
+  }
+
+  @Post('lobby_connect')
+  @UseGuards(InternalGuard)
+  async lobbyConnect(@Body() { ckey, ip, targetServer }: LobbyConnectDto): Promise<LobbyConnectResponse> {
+    return await this.webhookService.processLobbyConnect(ckey, ip, targetServer)
   }
 }
