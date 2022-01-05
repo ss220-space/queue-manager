@@ -87,7 +87,6 @@
       "desc": "Тестовый сервер",
       "extra": "",
       "connection_address": "game.ss220.space",
-      "test": true,
       "comms_password": "qwerty"
     }
   }

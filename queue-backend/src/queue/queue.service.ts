@@ -95,7 +95,6 @@ export class QueueService {
     let hasChanges = false
     for (const [serverPort, server] of Object.entries(servers)) {
       if (!server.queued) continue
-      if (!(server as any).test) continue
       for (let i = 0; i < 5; i++) {
         hasChanges = hasChanges || await this.processQueue(serverPort)
         if (!hasChanges) break
