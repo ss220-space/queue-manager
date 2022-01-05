@@ -77,7 +77,7 @@ const getTickerStateString = (tickerState: number | string | undefined) => {
     case TickerState.Pregame: return 'Лобби';
     case TickerState.SettingUp: return 'Подготовка';
     case TickerState.Playing: return 'Идёт игра';
-    case TickerState.Finished: return 'Завершение';
+    case TickerState.Finished: return 'Окончание';
   }
 }
 
