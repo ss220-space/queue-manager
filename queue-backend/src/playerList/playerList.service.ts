@@ -143,33 +143,35 @@ export class PlayerListService {
         this.logger.debug('lastPlayerList')
         this.logger.debug(lastPlayerList)
 
-        const keyList = Object.keys(lastPlayerList).length > 0 ? Object.keys(lastPlayerList) : fetchedByondPlayerList
+        const keyList = Object.keys(lastPlayerList || {})
+
+        const allUniqueCkeys = new Set([...keyList, ...fetchedByondPlayerList])
         const updatedPlayerList: PlayerListDto = {}
 
-        if (keyList) {
-          for (const key of keyList) {
-            const ckey = ckeySanitize(key)
-            this.logger.debug(`Next player is ${ckey}`)
 
-            // If player present in server player list
-            if (fetchedByondPlayerList?.includes(ckey)) {
-              // player was not on player list before, but have access, add pass anyway
+        for (const ckey of allUniqueCkeys) {
+          this.logger.debug(`Next player is ${ckey}`)
 
-              let adminFlags;
+          // If player present in server player list
+          if (fetchedByondPlayerList?.includes(ckey)) {
+            // player was not on player list before, but have access, add pass anyway
 
-              if (!lastPlayerList[ckey]) {
-                this.logger.log(`[${ckey}] New in playerList of ${serverPort}`)
-                await this.passService.addPassForCkey(ckey, <string>serverPort)
-                adminFlags = (await this.usersService.getUserPrivilegesByCkey(ckey)).adminFlags
-              } else {
-                adminFlags = lastPlayerList[ckey].adminFlags
-              }
+            let adminFlags;
 
-              updatedPlayerList[ckey] = {
-                time: Date.now(),
-                adminFlags,
-              }
+            if (!lastPlayerList[ckey]) {
+              this.logger.log(`[${ckey}] New in playerList of ${serverPort}`)
+              await this.passService.addPassForCkey(ckey, <string>serverPort)
+              adminFlags = (await this.usersService.getUserPrivilegesByCkey(ckey)).adminFlags
             } else {
+              adminFlags = lastPlayerList[ckey].adminFlags
+            }
+
+            updatedPlayerList[ckey] = {
+              time: Date.now(),
+              adminFlags,
+            }
+          } else {
+            if (lastPlayerList[ckey]) {
               const lastPresenceTime = lastPlayerList[ckey]?.time
               const allowedAwayTime = this.configService.get<number>('queue.ghost_away_threshold')
               if (Date.now() - lastPresenceTime > allowedAwayTime) {
@@ -180,6 +182,7 @@ export class PlayerListService {
             }
           }
         }
+
 
         this.logger.debug('updatedPlayerList')
         this.logger.debug(updatedPlayerList)
