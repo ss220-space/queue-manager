@@ -41,9 +41,9 @@ var/global/datum/http_system/SShttp
     world.log << "Response [src] [response.body]"
     var/list/resp = json_decode(response.body)
 
-    if (resp.redirect)
+    if (resp["redirect"])
         src << browse({"
-            <a id='link' href='[resp.redirect]'>
+            <a id='link' href='[resp["redirect"]]'>
                 LINK
             </a>
             <script type='text/javascript'>
@@ -56,6 +56,6 @@ var/global/datum/http_system/SShttp
     else 
         src << browse({"
             <script>
-                window.location.href = "[FRONTEND_URL]#token=[resp.token]"
+                window.location.href = "[FRONTEND_URL]#token=[resp["token"]]"
             </script>
         "})
