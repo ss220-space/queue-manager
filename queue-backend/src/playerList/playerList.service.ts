@@ -74,7 +74,7 @@ export class PlayerListService {
     if (onlyNewPlayers)
       players = players.filter((player) => player.new)
     if (noStaff)
-      players = players.filter((player) => isStaff(player.adminFlags || 0))
+      players = players.filter((player) => !isStaff(player.adminFlags || 0))
     return players.length
   }
 
