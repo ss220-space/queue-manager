@@ -3,4 +3,4 @@ allow_ports:
   - 7720
 redirect_port: 7730
 redirect_interfaces:
-    - eth0
+  - eth0
