@@ -1,18 +1,5 @@
 {
   "servers": {
-    "7720": {
-      "name": "Test",
-      "ip": "127.0.0.1",
-      "port": 7720,
-      "topic": "?status",
-      "format": "json",
-      "queued": true,
-      "desc": "Тестовый сервер",
-      "extra": "",
-      "connection_address": "game.ss220.space",
-      "test": true,
-      "comms_password": "qwerty"
-    },
     "7721": {
       "name": "Paradise Main",
       "ip": "127.0.0.1",
@@ -23,6 +10,28 @@
       "desc": "Основной сервер",
       "extra": "(НСН Керберос)",
       "connection_address": "game.ss220.space"
+    },
+    "7726": {
+      "name": "Paradise Secondary",
+      "ip": "127.0.0.1",
+      "port": 7726,
+      "topic": "?status",
+      "format": "json",
+      "queued": false,
+      "desc": "Второй сервер, копия основного для равномерного распределения онлайна",
+      "extra": "(НСН Керберос) <b style='color: #2ecc71'>(новый)</b>",
+      "connection_address": "game.ss220.space"
+    },
+    "7729": {
+      "name": "Paradise Vega",
+      "ip": "10.222.2.7",
+      "port": 7729,
+      "topic": "?status",
+      "format": "json",
+      "queued": true,
+      "desc": "Третий сервер, копия основного для равномерного распределения онлайна",
+      "extra": "(НСН Керберос) <b style='color: #2ecc71'>(новый)</b>",
+      "connection_address": "play.ss220.space"
     },
     "7722": {
       "name": "WL Prime",
@@ -68,16 +77,18 @@
       "extra": "(ИКН Сьерра)",
       "connection_address": "play.ss220.space"
     },
-    "7726": {
-      "name": "Paradise Secondary",
+    "7720": {
+      "name": "Test",
       "ip": "127.0.0.1",
-      "port": 7726,
+      "port": 7720,
       "topic": "?status",
       "format": "json",
-      "queued": false,
-      "desc": "Второй сервер, копия основного для равномерного распределения онлайна",
-      "extra": "(НСН Керберос) <b style='color: #2ecc71'>(новый)</b>",
-      "connection_address": "game.ss220.space"
+      "queued": true,
+      "desc": "Тестовый сервер",
+      "extra": "",
+      "connection_address": "game.ss220.space",
+      "test": true,
+      "comms_password": "qwerty"
     }
   }
 }
