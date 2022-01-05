@@ -66,6 +66,12 @@ export class QueueService {
     return true
   }
 
+  async isInQueue(ckey: string, serverPort: string): Promise<boolean> {
+    const ckeyEntry = JSON.stringify({ckey})
+    return (await this.redis.sismember(`byond_queue_${serverPort}_set`, ckeyEntry)) !== 0
+  }
+
+
   async queueStatus(ckey: string): Promise<ServerQueueStatus> {
     const ckeyEntry = JSON.stringify({ckey})
 
@@ -137,6 +143,8 @@ export class QueueService {
   @OnEvent(InternalEvent.StatusEventsDisconnect)
   private async onStatusEventsDisconnect(ckey: string) {
     for (const server of queuedServerList) {
+      if (!(await this.isInQueue(ckey, `${server.port}`))) continue
+
       await this.removeFromQueue(`${server.port}`, ckey)
     }
   }
