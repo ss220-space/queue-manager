@@ -54,13 +54,10 @@ export class PlayerListService {
   }
 
   async getSlotStats(serverPort: string) {
-    const reservedSlots = await this.getNewPlayerCount(serverPort)
-    const status = await this.webhooksService.getStatus(serverPort)
-    if (!status) return null
-
+    const occupied = await this.getPlayerCount(serverPort)
     return {
-      max: status.max_slots,
-      occupied: status.occupied_slots + reservedSlots,
+      max: servers[serverPort].max,
+      occupied,
     }
   }
 
@@ -73,9 +70,13 @@ export class PlayerListService {
     return Object.values(await this.getPlayerList(serverPort)).filter((player) => player.new).length
   }
 
+  async getPlayerCount(serverPort: string): Promise<number> {
+    return Object.values(await this.getPlayerList(serverPort)).length
+  }
+
   async isPlayerInList(serverPort: string, ckey: string): Promise<boolean> {
-    const playerlist = await this.getPlayerList(serverPort)
-    return Object.keys(playerlist).includes(ckey)
+    const playerList = await this.getPlayerList(serverPort)
+    return Object.keys(playerList).includes(ckey)
   }
 
   private async removePlayer(serverPort: string, ckey: string): Promise<void> {

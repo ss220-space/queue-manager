@@ -34,7 +34,8 @@
       "queued": true,
       "desc": "Третий сервер, копия основного для равномерного распределения онлайна",
       "extra": "(НСН Керберос) <b style='color: #2ecc71'>(новый)</b>",
-      "connection_address": "play.ss220.space"
+      "connection_address": "play.ss220.space",
+      "max": 100
     },
     "7722": {
       "order": 3,
@@ -95,7 +96,8 @@
       "desc": "Тестовый сервер",
       "extra": "",
       "connection_address": "game.ss220.space",
-      "comms_password": "qwerty"
+      "comms_password": "qwerty",
+      "max": 100
     }
   }
 }
