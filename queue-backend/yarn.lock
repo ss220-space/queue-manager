@@ -2851,6 +2851,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"core-js@npm:^3.6.5":
+  version: 3.20.2
+  resolution: "core-js@npm:3.20.2"
+  checksum: dc055a5a79f2e3c2e060b4fb8a3e228fa0de16464bff3c6605646183139eebaa68c390ec6d9c3acc5677f333df510b977ee3f1d5992e6c36b1f200e35f5ed8ca
+  languageName: node
+  linkType: hard
+
 "core-util-is@npm:~1.0.0":
   version: 1.0.3
   resolution: "core-util-is@npm:1.0.3"
@@ -6097,6 +6104,7 @@ __metadata:
     passport-jwt: ^4.0.0
     prettier: 2.5.1
     prisma: ^3.7.0
+    promise-socket: ^7.0.0
     reflect-metadata: 0.1.13
     request-ip: ^2.1.3
     rimraf: 3.0.2
@@ -6678,10 +6686,30 @@ __metadata:
   languageName: node
   linkType: hard
 
+"promise-duplex@npm:^6.0.0":
+  version: 6.0.0
+  resolution: "promise-duplex@npm:6.0.0"
+  dependencies:
+    core-js: ^3.6.5
+    promise-readable: ^6.0.0
+    promise-writable: ^6.0.0
+  checksum: 402ea90c81194ed5176ef2887f31155eb59d19d57dc9f37be2fa9e382654b9a5828c121b3da2e34ccf99bd7b78fae330b357adf20307407d9996e1a3e030b97a
+  languageName: node
+  linkType: hard
+
 "promise-inflight@npm:^1.0.1":
   version: 1.0.1
   resolution: "promise-inflight@npm:1.0.1"
   checksum: 22749483091d2c594261517f4f80e05226d4d5ecc1fc917e1886929da56e22b5718b7f2a75f3807e7a7d471bc3be2907fe92e6e8f373ddf5c64bae35b5af3981
+  languageName: node
+  linkType: hard
+
+"promise-readable@npm:^6.0.0":
+  version: 6.0.0
+  resolution: "promise-readable@npm:6.0.0"
+  dependencies:
+    core-js: ^3.6.5
+  checksum: 2e93f83457011ca721e7a55b9bb5045f2bf75dc1435d1912a2f20db1ba309e3343364eb68525e87b4c8b27baa0ab04619d0a3c064e944584260b620ebcbb1bef
   languageName: node
   linkType: hard
 
@@ -6692,6 +6720,23 @@ __metadata:
     err-code: ^2.0.2
     retry: ^0.12.0
   checksum: f96a3f6d90b92b568a26f71e966cbbc0f63ab85ea6ff6c81284dc869b41510e6cdef99b6b65f9030f0db422bf7c96652a3fff9f2e8fb4a0f069d8f4430359429
+  languageName: node
+  linkType: hard
+
+"promise-socket@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "promise-socket@npm:7.0.0"
+  dependencies:
+    promise-duplex: ^6.0.0
+    tslib: ^2.0.1
+  checksum: 88520afa6872a542345d0fd2dc372e6e2c88ac6a2f282309eb25d5cbc3ffda44070a60a19a7c1225942e935091fdb51d1956da706dc9fd38ecfdc99c54ac3a99
+  languageName: node
+  linkType: hard
+
+"promise-writable@npm:^6.0.0":
+  version: 6.0.0
+  resolution: "promise-writable@npm:6.0.0"
+  checksum: 805441f35a88303f60bf84354ca826b8c6183ffdbaad296782a0ebc9e0b03e57e653e15d70cd52131902d5611f618dbbe5a140e41865a358f1fc9ce398bc41eb
   languageName: node
   linkType: hard
 
@@ -7857,7 +7902,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:2.3.1, tslib@npm:^2.3.1":
+"tslib@npm:2.3.1, tslib@npm:^2.0.1, tslib@npm:^2.3.1":
   version: 2.3.1
   resolution: "tslib@npm:2.3.1"
   checksum: de17a98d4614481f7fcb5cd53ffc1aaf8654313be0291e1bfaee4b4bb31a20494b7d218ff2e15017883e8ea9626599b3b0e0229c18383ba9dce89da2adf15cb9
