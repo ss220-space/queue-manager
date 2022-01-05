@@ -8,6 +8,7 @@ use regex::Regex;
 
 pub(crate) struct FwChain {
     name: String,
+    interfaces: Vec<String>,
     inbound_port: u16,
     accepts: HashSet<Ipv4Addr>,
     redirect_port: u16
@@ -21,9 +22,10 @@ lazy_static! {
 
 impl FwChain {
 
-    pub fn new(name: String, inbound_port: u16, redirect_port: u16) -> Self {
+    pub fn new(name: String, interfaces: Vec<String>, inbound_port: u16, redirect_port: u16) -> Self {
         return Self {
             name,
+            interfaces,
             inbound_port,
             accepts: HashSet::new(),
             redirect_port
@@ -50,17 +52,21 @@ impl FwChain {
             IPTABLES.new_chain("nat", self.name.as_str())?;
         }
         IPTABLES.append_replace("nat", self.name.as_str(), format!("-p tcp -j REDIRECT --to-port {}", self.redirect_port).as_str())?;
-        IPTABLES.append_replace("nat", "PREROUTING", self.jump_rule().as_str())?;
+        for interface in &self.interfaces {
+            IPTABLES.append_replace("nat", "PREROUTING", self.jump_rule(interface).as_str())?;
+        }
         self.restore()
     }
 
-    fn jump_rule(&self) -> String {
-        return format!("-p tcp --dport {} --jump {}", self.inbound_port, self.name);
+    fn jump_rule(&self, interface: &str) -> String {
+        return format!("-i {} -p tcp --dport {} --jump {}", interface, self.inbound_port, self.name);
     }
 
     pub fn cleanup(&mut self) -> IPTablesResult<()> {
         IPTABLES.flush_chain("nat", self.name.as_str())?;
-        IPTABLES.delete_all("nat", "PREROUTING", self.jump_rule().as_str())?;
+        for interface in &self.interfaces {
+            IPTABLES.delete_all("nat", "PREROUTING", self.jump_rule(interface).as_str())?;
+        }
         IPTABLES.delete_chain("nat", self.name.as_str())
     }
 

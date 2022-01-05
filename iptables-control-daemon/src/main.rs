@@ -19,6 +19,7 @@ use crate::fwmanage::FwChain;
 struct DConfig {
     master_uri: String,
     allow_ports: Vec<u16>,
+    redirect_interfaces: Vec<String>,
     redirect_port: u16
 }
 
@@ -77,6 +78,7 @@ impl FwState {
             || {
                 let mut chain = FwChain::new(
                     format!("SS_ENTRY_{}", port),
+                    config.redirect_interfaces.clone(),
                     port,
                     config.redirect_port
                 );
