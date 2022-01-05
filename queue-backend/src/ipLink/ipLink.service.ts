@@ -4,8 +4,7 @@ import IORedis from 'ioredis';
 import { EventEmitter2 } from '@nestjs/event-emitter'
 import { InternalEvent } from '../common/enums/internalEvent.enum'
 import { IpChangeEvent } from '../common/events/ip-change.event'
-
-const IP_EXPIRE = 12 * 60 * 60 * 1000
+import { ConfigService } from '@nestjs/config'
 
 @Injectable()
 export class IpLinkService {
@@ -13,6 +12,7 @@ export class IpLinkService {
   constructor(
     private readonly redisService: RedisService,
     private readonly eventEmitter: EventEmitter2,
+    private readonly configService: ConfigService,
   ) {
     this.redis = redisService.getClient()
   }
@@ -29,7 +29,8 @@ export class IpLinkService {
       }
       this.eventEmitter.emit(InternalEvent.IpAdded, event)
     }
-    const removeUpTo = `(${Date.now() - IP_EXPIRE}`
+    const ipExpire = this.configService.get<number>('queue.ip_expire')
+    const removeUpTo = `(${Date.now() - ipExpire}`
     const toRemove = await this.redis.zrangebyscore(`ip_of:${ckey}`, '-inf', removeUpTo)
     if (toRemove) {
       await this.redis.zremrangebyscore(`ip_of:${ckey}`, '-inf', removeUpTo)
@@ -41,6 +42,7 @@ export class IpLinkService {
   }
 
   async getIp(ckey: string): Promise<string[]> {
-    return await this.redis.zrangebyscore(`ip_of:${ckey}`, Date.now() - IP_EXPIRE, '+inf')
+    const ipExpire = this.configService.get<number>('queue.ip_expire')
+    return await this.redis.zrangebyscore(`ip_of:${ckey}`, Date.now() - ipExpire, '+inf')
   }
 }
