@@ -9,7 +9,7 @@ import { PassService } from '../pass/pass.service';
 import { WebhooksService } from '../webhooks/webhooks.service';
 import { ckeySanitize } from '../common/utils'
 import { queuedServerList } from '../config/server-config'
-import { Mutex } from 'async-mutex'
+import { Mutex, withTimeout } from 'async-mutex'
 
 export class PlayerInfoDto {
   time: number
@@ -34,7 +34,7 @@ export class PlayerListService {
   }
   private readonly redis: IORedis.Redis
   private readonly logger = new Logger(PlayerListService.name);
-  private readonly playerListMutex = new Mutex()
+  private readonly playerListMutex = withTimeout(new Mutex(), 20000, new Error('Player list mutation timed out'))
 
   async addFromQueue(serverPort: string, ckey: string): Promise<void> {
     // Mutex needed to avoid write conflicts
