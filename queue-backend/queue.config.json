@@ -1,6 +1,7 @@
 {
   "servers": {
     "7721": {
+      "order": 0,
       "name": "Paradise Main",
       "ip": "127.0.0.1",
       "port": 7721,
@@ -12,6 +13,7 @@
       "connection_address": "game.ss220.space"
     },
     "7726": {
+      "order": 1,
       "name": "Paradise Secondary",
       "ip": "127.0.0.1",
       "port": 7726,
@@ -23,6 +25,7 @@
       "connection_address": "game.ss220.space"
     },
     "7729": {
+      "order": 2,
       "name": "Paradise Vega",
       "ip": "10.222.2.7",
       "port": 7729,
@@ -34,6 +37,7 @@
       "connection_address": "play.ss220.space"
     },
     "7722": {
+      "order": 3,
       "name": "WL Prime",
       "ip": "127.0.0.1",
       "port": 7722,
@@ -45,6 +49,7 @@
       "connection_address": "game.ss220.space"
     },
     "7723": {
+      "order": 4,
       "name": "Paradise WL",
       "ip": "10.222.2.7",
       "port": 7723,
@@ -56,6 +61,7 @@
       "connection_address": "play.ss220.space"
     },
     "7724": {
+      "order": 5,
       "name": "Paradise Extended eXperimental",
       "ip": "10.222.2.12",
       "port": 7724,
@@ -67,6 +73,7 @@
       "connection_address": "ex.ss220.space"
     },
     "7725": {
+      "order": 6,
       "name": "Bay12 Sierra",
       "ip": "10.222.2.7",
       "port": 7725,
@@ -78,6 +85,7 @@
       "connection_address": "play.ss220.space"
     },
     "7720": {
+      "order": 7,
       "name": "Test",
       "ip": "127.0.0.1",
       "port": 7720,

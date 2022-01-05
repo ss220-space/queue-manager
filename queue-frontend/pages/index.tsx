@@ -248,7 +248,7 @@ function Home({ initialServers, renderDate }: InferGetServerSidePropsType<typeof
 
       <Container fluid>
         <Row xs={1} md={2} lg={3}>
-          {servers.map(server => (
+          {servers.sort((a, b) => a.order - b.order).map(server => (
             <Col className='p-3' key={server.name}>
               { ServerCard(server, token, queue != null, queue?.[server.port]) }
             </Col>

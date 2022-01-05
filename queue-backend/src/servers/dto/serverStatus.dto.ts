@@ -6,6 +6,7 @@ export class ServerStatus {
   connection_address: string;
   port: string;
   queued: string;
+  order: number;
   status?: {
     ticker_state: TickerState;
     mode: string;
