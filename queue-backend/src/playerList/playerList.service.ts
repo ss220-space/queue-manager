@@ -6,14 +6,15 @@ import { servers } from '@/queue.config.json';
 import { ByondService } from '../byond/byond.service';
 import { ConfigService } from '@nestjs/config';
 import { PassService } from '../pass/pass.service';
-import { WebhooksService } from '../webhooks/webhooks.service';
-import { ckeySanitize } from '../common/utils'
+import { ckeySanitize, isStaff } from '../common/utils'
 import { queuedServerList } from '../config/server-config'
 import { Mutex, withTimeout } from 'async-mutex'
+import { UsersService } from '../users/users.service'
 
 export class PlayerInfoDto {
   time: number
-  new: boolean | null
+  new?: boolean
+  adminFlags?: number
 }
 
 export class PlayerListDto {
@@ -27,7 +28,7 @@ export class PlayerListService {
     private readonly byondService: ByondService,
     private readonly configService: ConfigService,
     private readonly passService: PassService,
-    private readonly webhooksService: WebhooksService,
+    private readonly usersService: UsersService,
   ) {
     this.redis = redisService.getClient()
 
@@ -37,10 +38,12 @@ export class PlayerListService {
   private readonly playerListMutex = withTimeout(new Mutex(), 20000, new Error('Player list mutation timed out'))
 
   async addFromQueue(serverPort: string, ckey: string): Promise<void> {
+    const { adminFlags } = await this.usersService.getUserPrivilegesByCkey(ckey)
     // Mutex needed to avoid write conflicts
     await this.playerListMutex.runExclusive(async() => {
       const playerList = await this.getPlayerList(serverPort)
       playerList[ckey] = {
+        adminFlags,
         new: true,
         time: Date.now(),
       }
@@ -54,7 +57,7 @@ export class PlayerListService {
   }
 
   async getSlotStats(serverPort: string) {
-    const occupied = await this.getPlayerCount(serverPort)
+    const occupied = this.getPlayerCount(serverPort, false, true)
     return {
       max: servers[serverPort].max,
       occupied,
@@ -66,12 +69,13 @@ export class PlayerListService {
     return playerListStr ? JSON.parse(playerListStr) : {}
   }
 
-  async getNewPlayerCount(serverPort: string): Promise<number> {
-    return Object.values(await this.getPlayerList(serverPort)).filter((player) => player.new).length
-  }
-
-  async getPlayerCount(serverPort: string): Promise<number> {
-    return Object.values(await this.getPlayerList(serverPort)).length
+  async getPlayerCount(serverPort: string, onlyNewPlayers = false, noStaff = true): Promise<number> {
+    let players = Object.values(await this.getPlayerList(serverPort))
+    if (onlyNewPlayers)
+      players = players.filter((player) => player.new)
+    if (noStaff)
+      players = players.filter((player) => isStaff(player.adminFlags || 0))
+    return players.length
   }
 
   async isPlayerInList(serverPort: string, ckey: string): Promise<boolean> {
@@ -140,7 +144,7 @@ export class PlayerListService {
         this.logger.debug(lastPlayerList)
 
         const keyList = Object.keys(lastPlayerList).length > 0 ? Object.keys(lastPlayerList) : fetchedByondPlayerList
-        const updatedPlayerList = {}
+        const updatedPlayerList: PlayerListDto = {}
 
         if (keyList) {
           for (const key of keyList) {
@@ -150,13 +154,20 @@ export class PlayerListService {
             // If player present in server player list
             if (fetchedByondPlayerList?.includes(ckey)) {
               // player was not on player list before, but have access, add pass anyway
+
+              let adminFlags;
+
               if (!lastPlayerList[ckey]) {
                 this.logger.log(`[${ckey}] New in playerList of ${serverPort}`)
                 await this.passService.addPassForCkey(ckey, <string>serverPort)
+                adminFlags = (await this.usersService.getUserPrivilegesByCkey(ckey)).adminFlags
+              } else {
+                adminFlags = lastPlayerList[ckey].adminFlags
               }
 
               updatedPlayerList[ckey] = {
                 time: Date.now(),
+                adminFlags,
               }
             } else {
               const lastPresenceTime = lastPlayerList[ckey]?.time

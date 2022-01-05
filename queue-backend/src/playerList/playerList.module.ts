@@ -4,7 +4,7 @@ import { ByondModule } from '../byond/byond.module';
 import { PassModule } from '../pass/pass.module';
 import { RedisModule } from 'nestjs-redis';
 import { ConfigModule } from '@nestjs/config';
-import { WebhooksModule } from '../webhooks/webhooks.module';
+import { UsersModule } from '../users/users.module'
 
 @Module({
   imports: [
@@ -12,7 +12,7 @@ import { WebhooksModule } from '../webhooks/webhooks.module';
     PassModule,
     RedisModule,
     ConfigModule,
-    WebhooksModule,
+    UsersModule,
   ],
   providers: [PlayerListService],
   exports: [PlayerListService],

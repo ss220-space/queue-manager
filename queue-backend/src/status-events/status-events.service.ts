@@ -6,9 +6,9 @@ import { EventEmitter2, OnEvent } from '@nestjs/event-emitter'
 import { InternalEvent } from '../common/enums/internalEvent.enum'
 import { QueuesState } from '../common/queues-state'
 import { PassUpdateEvent } from '../common/events/pass-update.event'
-import { AdminFlag } from '../roles/adminFlag.enum'
 import { IpLinkService } from '../ipLink/ipLink.service'
 import { PassService } from '../pass/pass.service'
+import { isStaff } from '../common/utils'
 
 export class StatusEvent implements MessageEvent {
   data: ServerStatus[];
@@ -109,7 +109,7 @@ export class StatusEventsService {
 
   async onClientConnect(ckey: string, adminFlags: number, ip: string) {
     await this.ipLinkService.linkIp(ckey, ip)
-    if ((adminFlags & (AdminFlag.R_MENTOR | AdminFlag.R_MOD | AdminFlag.R_ADMIN)) !== 0) {
+    if (isStaff(adminFlags)) {
       this.passService.addPassesForCkey(ckey)
     }
 
