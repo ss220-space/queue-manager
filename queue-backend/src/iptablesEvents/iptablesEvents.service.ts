@@ -68,14 +68,23 @@ export class IptablesEventsService {
     }
   }
 
-  @OnEvent(InternalEvent.IpChanged, {promisify:true})
-  async handleIpChanged({ckey, newIp, oldIp}: IpChangeEvent): Promise<void> {
+  @OnEvent(InternalEvent.IpAdded, {promisify:true})
+  async handleIpAdded({ckey, ip}: IpChangeEvent): Promise<void> {
     const passes = await this.passService.getPassesByCkey(ckey)
     if (passes.length == 0) return
-    this.logger.debug(`[${ckey}] ip change ${oldIp} -> ${newIp} with active passes: ${passes}`)
+    this.logger.debug(`[${ckey}] ip change +${ip} with active passes: ${passes}`)
     for (const port of passes) {
-      await this.onRemoveCkeyPass(ckey, oldIp, port)
-      await this.onAddCkeyPass(ckey, newIp, port)
+      await this.onAddCkeyPass(ckey, ip, port)
+    }
+  }
+
+  @OnEvent(InternalEvent.IpRemoved, {promisify:true})
+  async handleIpRemoved({ckey, ip}: IpChangeEvent): Promise<void> {
+    const passes = await this.passService.getPassesByCkey(ckey)
+    if (passes.length == 0) return
+    this.logger.debug(`[${ckey}] ip change -${ip} with active passes: ${passes}`)
+    for (const port of passes) {
+      await this.onRemoveCkeyPass(ckey, ip, port)
     }
   }
 

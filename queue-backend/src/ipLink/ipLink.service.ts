@@ -5,6 +5,8 @@ import { EventEmitter2 } from '@nestjs/event-emitter'
 import { InternalEvent } from '../common/enums/internalEvent.enum'
 import { IpChangeEvent } from '../common/events/ip-change.event'
 
+const IP_EXPIRE = 12 * 60 * 60 * 1000
+
 @Injectable()
 export class IpLinkService {
 
@@ -19,19 +21,26 @@ export class IpLinkService {
 
   async linkIp(ckey: string, ip: string): Promise<void> {
     ip = ip.split(':').pop()
-    const prev = await this.redis.getset(`ip_of:${ckey}`, ip)
-    if (prev !== ip) {
+    const added = await this.redis.zadd(`ip_of:${ckey}`, Date.now(), ip)
+    if (added > 0) {
       const event: IpChangeEvent = {
-        newIp: ip,
-        oldIp: prev,
+        ip,
         ckey,
       }
-      this.eventEmitter.emit(InternalEvent.IpChanged, event)
+      this.eventEmitter.emit(InternalEvent.IpAdded, event)
+    }
+    const removeUpTo = `(${Date.now() - IP_EXPIRE}`
+    const toRemove = await this.redis.zrangebyscore(`ip_of:${ckey}`, '-inf', removeUpTo)
+    if (toRemove) {
+      await this.redis.zremrangebyscore(`ip_of:${ckey}`, '-inf', removeUpTo)
+      for (ip of toRemove) {
+        const event: IpChangeEvent = {ip, ckey}
+        this.eventEmitter.emit(InternalEvent.IpRemoved, event)
+      }
     }
   }
 
   async getIp(ckey: string): Promise<string[]> {
-    const ip = await this.redis.get(`ip_of:${ckey}`)
-    return [ip]
+    return await this.redis.zrangebyscore(`ip_of:${ckey}`, Date.now() - IP_EXPIRE, '+inf')
   }
 }

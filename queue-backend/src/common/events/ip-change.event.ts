@@ -1,5 +1,4 @@
 export class IpChangeEvent {
-  newIp: string
-  oldIp: string
+  ip: string
   ckey: string
 }
