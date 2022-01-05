@@ -130,7 +130,7 @@ function Home({ initialServers, renderDate }: InferGetServerSidePropsType<typeof
     load()
 
     const audio = new Audio("bikehorn.mp3")
-    audio.volume = 0.5
+    audio.volume = 0.1
 
     const eventSource = new EventSourcePolyfill (
       `${backendUrl}/api/v1/servers/status-events`,
