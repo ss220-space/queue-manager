@@ -1,6 +1,5 @@
 import { Injectable, Logger, MessageEvent } from '@nestjs/common';
 import {Subject} from 'rxjs';
-import { ServerStatus } from '../servers/dto/serverStatus.dto';
 import { ServerPassUpdate, ServerQueueStatus } from '../queue/dto/queueStatus.dto'
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter'
 import { InternalEvent } from '../common/enums/internalEvent.enum'
@@ -10,9 +9,10 @@ import { IpLinkService } from '../ipLink/ipLink.service'
 import { PassService } from '../pass/pass.service'
 import { isStaff } from '../common/utils'
 import { UserDto } from '../auth/dto/user.dto';
+import { ServersStatus } from '../servers/dto/serversStatus.dto'
 
 export class StatusEvent implements MessageEvent {
-  data: ServerStatus[];
+  data: ServersStatus;
   type = StatusEvent.name;
 }
 
@@ -92,7 +92,7 @@ export class StatusEventsService {
 
   private logger = new Logger(StatusEventsService.name)
 
-  onStatusUpdate(data: ServerStatus[]): void {
+  onStatusUpdate(data: ServersStatus): void {
     const allStatus = new StatusEvent()
     allStatus.data = data
     this.statusEventSubject.next(allStatus)

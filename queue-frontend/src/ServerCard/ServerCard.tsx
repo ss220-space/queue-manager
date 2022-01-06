@@ -60,6 +60,11 @@ export type Server = {
   }
 }
 
+export type ServersStatus = {
+  servers: Server[]
+  now: number
+}
+
 export type Queue = {
   [serverPort: string]: ServerQueue
 }
@@ -81,8 +86,8 @@ const getTickerStateString = (tickerState: number | string | undefined) => {
   }
 }
 
-export default function ServerCard(server: Server, token: string, queueLoaded: boolean, queue?: ServerQueue) {
-  const isStale: boolean = !server.status || Date.parse(server.status.date) < (Date.now() - 60 * 1000) 
+export default function ServerCard(server: Server, serverNow: number, token: string, queueLoaded: boolean, queue?: ServerQueue) {
+  const isStale: boolean = !server.status || Date.parse(server.status.date) < (serverNow - 60 * 1000)
 
   async function handleClick() {
     if (server.queued && !queue?.hasPass) {

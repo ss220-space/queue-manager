@@ -1,4 +1,4 @@
-import ServerCard from '@/src/ServerCard/ServerCard'
+import ServerCard, { ServersStatus } from '@/src/ServerCard/ServerCard'
 import type { InferGetServerSidePropsType } from 'next'
 import Head from 'next/head'
 import { MutableRefObject, useEffect, useRef, useState } from 'react'
@@ -35,7 +35,7 @@ export async function getStaticProps() {
   const res = await fetch(`${backendUrl}/api/v1/servers/status`, {
     cache: 'no-cache',
   })
-  const servers: Server[] = await res.json()
+  const servers: ServersStatus = await res.json()
 
   return {
     props: {
@@ -101,7 +101,7 @@ function PassToasts(
 
 function Home({ initialServers, renderDate }: InferGetServerSidePropsType<typeof getStaticProps>) {
   const [token, setToken] = useState('');
-  const [servers, setServers] = useState<Server[]>(initialServers)
+  const [serversStatus, setServersStatus] = useState<ServersStatus>(initialServers)
   const [queue, setQueue] = useState<Queue>()
   const [profile, setProfile] = useState<UserProfile>()
   const [passEvents, setPassEvents] = useState<NewPassEvent[]>([])
@@ -117,7 +117,7 @@ function Home({ initialServers, renderDate }: InferGetServerSidePropsType<typeof
       const res = await fetch(`${backendUrl}/api/v1/servers/status`, {
         cache: 'no-cache',
       })
-      setServers(await res.json())
+      setServersStatus(await res.json())
     }
     load()
   }, [renderDate])
@@ -144,7 +144,7 @@ function Home({ initialServers, renderDate }: InferGetServerSidePropsType<typeof
       }
     );
     eventSource.addEventListener('StatusEvent', ({ data }: any) => {
-      setServers(JSON.parse(data))
+      setServersStatus(JSON.parse(data))
     })
     eventSource.addEventListener('QueueEvent', ({ data }: any) => {
       console.log(data)
@@ -237,7 +237,7 @@ function Home({ initialServers, renderDate }: InferGetServerSidePropsType<typeof
 
       {
         PassToasts(
-          servers,
+          serversStatus.servers,
           passEvents,
           (event) => {
             setPassEvents((events) => events.filter((e) => e !== event))
@@ -249,9 +249,9 @@ function Home({ initialServers, renderDate }: InferGetServerSidePropsType<typeof
 
       <Container fluid>
         <Row xs={1} md={2} lg={3}>
-          {servers.sort((a, b) => a.order - b.order).map(server => (
+          {serversStatus.servers.sort((a, b) => a.order - b.order).map(server => (
             <Col className='p-3' key={server.name}>
-              { ServerCard(server, token, queue != null, queue?.[server.port]) }
+              { ServerCard(server, serversStatus.now, token, queue != null, queue?.[server.port]) }
             </Col>
           ))}
         </Row>

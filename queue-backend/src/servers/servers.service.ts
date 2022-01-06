@@ -10,6 +10,7 @@ import { ServerStatus } from './dto/serverStatus.dto';
 import { QueueService } from '../queue/queue.service';
 import { Interval } from '@nestjs/schedule'
 import { ByondService } from '../byond/byond.service';
+import { ServersStatus } from './dto/serversStatus.dto'
 
 @Injectable()
 export class ServersService {
@@ -58,10 +59,14 @@ export class ServersService {
     }
   }
 
-  async servers(): Promise<ServerStatus[]> {
-    return await Promise.all(Object.keys(servers).map(async serverPort => {
+  async servers(): Promise<ServersStatus> {
+    const perServer = await Promise.all(Object.keys(servers).map(async serverPort => {
       return await this.server(serverPort)
     }))
+    return {
+      servers: perServer,
+      now: Date.now(),
+    }
   }
 
   async status(serverPort: string): Promise<any | null> {
