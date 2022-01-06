@@ -108,11 +108,11 @@ export class StatusEventsService {
     this.passEventSubject.next(event)
   }
 
-  async onClientConnect({ckey, adminFlags, donatorTier}: UserDto, ip: string) {
+  async onClientConnect({ckey, adminFlags, donatorTier, hasActiveBan}: UserDto, ip: string) {
     await this.ipLinkService.linkIp(ckey, ip)
     if (isStaff(adminFlags)) {
       this.passService.addPassesForCkey(ckey)
-    } else if (donatorTier >= 3) {
+    } else if (donatorTier >= 3 && !hasActiveBan) {
       this.passService.addPassesForCkey(ckey)
     }
 
