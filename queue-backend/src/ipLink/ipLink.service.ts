@@ -29,14 +29,6 @@ export class IpLinkService {
     }
     if (parsedIp.kind()!=='ipv4') return
     ip = (parsedIp as IPv4).toString()
-    const added = await this.redis.zadd(`ip_of:${ckey}`, Date.now(), ip)
-    if (added > 0) {
-      const event: IpChangeEvent = {
-        ip,
-        ckey,
-      }
-      this.eventEmitter.emit(InternalEvent.IpAdded, event)
-    }
     const ipExpire = this.configService.get<number>('queue.ip_expire')
     const removeUpTo = `(${Date.now() - ipExpire}`
     const toRemove = await this.redis.zrangebyscore(`ip_of:${ckey}`, '-inf', removeUpTo)
@@ -46,6 +38,15 @@ export class IpLinkService {
         const event: IpChangeEvent = {ip, ckey}
         this.eventEmitter.emit(InternalEvent.IpRemoved, event)
       }
+    }
+
+    const added = await this.redis.zadd(`ip_of:${ckey}`, Date.now(), ip)
+    if (added > 0) {
+      const event: IpChangeEvent = {
+        ip,
+        ckey,
+      }
+      this.eventEmitter.emit(InternalEvent.IpAdded, event)
     }
   }
 
