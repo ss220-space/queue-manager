@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { JwtService, JwtSignOptions, JwtVerifyOptions } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { JwtPayloadDto } from './dto/jwtPayload.dto';
+import { UserDto } from './dto/user.dto';
 
 @Injectable()
 export class AuthService {
@@ -13,23 +14,26 @@ export class AuthService {
 
   async generateUserToken(ckey: string, signOptions: JwtSignOptions = {}): Promise<string> {
     const user = await this.getProfile(ckey);
-    return this.jwtService.sign({ 
+    const jwtPayload: JwtPayloadDto = { 
       sub: ckey,  
-      roles: user.adminFlags, 
+      roles: user.adminFlags,
+      donor: user.donatorTier,
       ban: user.hasActiveBan,
-    }, signOptions)
+    }
+    return this.jwtService.sign(jwtPayload, signOptions)
   }
 
   verifyUserToken(token: string, verifyOptions: JwtVerifyOptions = {}): JwtPayloadDto {
     return this.jwtService.verify(token, verifyOptions)
   }
 
-  async getProfile(ckey: string) {
+  async getProfile(ckey: string): Promise<UserDto> {
     const user = await this.usersService.getUserPrivilegesByCkey(ckey)
     const ban = await this.usersService.getActiveBanByCkey(ckey)
     return {
       ckey,
       adminFlags: user.adminFlags,
+      donatorTier: user.donatorTier,
       hasActiveBan: ban ? true : false,
     }
   }

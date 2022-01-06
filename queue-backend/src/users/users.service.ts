@@ -8,6 +8,7 @@ import {
 } from '@prisma/client';
 import { AdminRank } from '../common/enums/adminRank.enum';
 import { UserPrivilegesDto } from './dto/userPrivileges.dto';
+import { dateNormilized } from '../common/utils';
 
 @Injectable()
 export class UsersService {
@@ -54,10 +55,10 @@ export class UsersService {
       ckey, 
       active: true,
       start_date: {
-        lte: new Date(),
+        lte: dateNormilized(),
       },
       end_date: {
-        gt: new Date(),
+        gt: dateNormilized(),
       },
     })
       
