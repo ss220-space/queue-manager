@@ -10,6 +10,7 @@ import { AdminFlag, hasFlag } from '../src/adminFlag.enum'
 import { BanModal } from '@/src/BanModal/BanModal'
 import { backendUrl, requestBackendData } from '../src/utils'
 import moment from 'moment'
+import 'moment/locale/ru'
 import { Set } from 'immutable'
 
 export type ServerPort = string
@@ -89,7 +90,7 @@ function PassToasts(
         <Toast key={`${event.time}`} onClose={() => { dropEvent(event) }} delay={10000} autohide>
           <Toast.Header>
             <strong className="me-auto">{servers.find((server) => server.port == event.serverPort)?.name}</strong>
-            <small>{moment(event.time).fromNow()}</small>
+            <small>{moment(event.time).locale("ru").fromNow()}</small>
           </Toast.Header>
           <Toast.Body>Получен доступ</Toast.Body>
         </Toast>
