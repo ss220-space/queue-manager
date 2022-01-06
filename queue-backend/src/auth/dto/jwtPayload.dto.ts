@@ -1,6 +1,6 @@
 export class JwtPayloadDto {
   sub: string
-  roles: number
-  donor: number
+  roles?: number
+  donor?: number
   ban: boolean
 }
