@@ -9,6 +9,7 @@ import { PassUpdateEvent } from '../common/events/pass-update.event'
 import { IpLinkService } from '../ipLink/ipLink.service'
 import { PassService } from '../pass/pass.service'
 import { isStaff } from '../common/utils'
+import { UserDto } from '../auth/dto/user.dto';
 
 export class StatusEvent implements MessageEvent {
   data: ServerStatus[];
@@ -107,9 +108,11 @@ export class StatusEventsService {
     this.passEventSubject.next(event)
   }
 
-  async onClientConnect(ckey: string, adminFlags: number, ip: string) {
+  async onClientConnect({ckey, adminFlags, donatorTier}: UserDto, ip: string) {
     await this.ipLinkService.linkIp(ckey, ip)
     if (isStaff(adminFlags)) {
+      this.passService.addPassesForCkey(ckey)
+    } else if (donatorTier >= 3) {
       this.passService.addPassesForCkey(ckey)
     }
 

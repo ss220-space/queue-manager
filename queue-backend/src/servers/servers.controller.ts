@@ -40,8 +40,9 @@ export class ServersController {
 
   @UseGuards(JwtAuthGuard)
   @Sse('status-events')
-  async statusEvents(@Request() {user: {ckey, adminFlags}}: RequestUserDto, @RealIp() ip: string): Promise<Observable<MessageEvent>> {
-    await this.statusEventsService.onClientConnect(ckey, adminFlags, ip)
+  async statusEvents(@Request() { user }: RequestUserDto, @RealIp() ip: string): Promise<Observable<MessageEvent>> {
+    const { ckey } = user
+    await this.statusEventsService.onClientConnect(user, ip)
 
     const queueUpdates = this.statusEventsService.queuesEventSubject.asObservable().pipe(
       map((queuesUpdate) => {
