@@ -1,6 +1,6 @@
 import { InferGetServerSidePropsType } from 'next'
 import { useEffect, useState } from 'react'
-import { Server } from '../src/ServerCard/ServerCard'
+import { ServersStatus } from '../src/ServerCard/ServerCard'
 import { EventSourcePolyfill } from 'event-source-polyfill'
 import { Button, Col, Container, Modal, Nav, Row, Tab, Table } from 'react-bootstrap'
 import Head from 'next/head'
@@ -38,7 +38,7 @@ export async function getStaticProps() {
   const res = await fetch(`${backendUrl}/api/v1/servers/status`, {
     cache: 'no-cache',
   })
-  const servers: Server[] = await res.json()
+  const servers: ServersStatus = await res.json()
 
   return {
     props: {
@@ -155,7 +155,7 @@ function ConfirmDialog(state: ConfirmDialogState | null, onClose: () => void) {
 }
 
 
-function Admin({ initialServers: servers }: InferGetServerSidePropsType<typeof getStaticProps>) {
+function Admin({ initialServers: serversStatus }: InferGetServerSidePropsType<typeof getStaticProps>) {
   const [token, setToken] = useState('');
 
   const [queuesState, setQueuesState] = useState<QueuesState>({})
@@ -212,7 +212,7 @@ function Admin({ initialServers: servers }: InferGetServerSidePropsType<typeof g
     }
   }, [token])
 
-  const queuedSevers = servers.filter((server) => server.queued)
+  const queuedSevers = serversStatus.servers.filter((server) => server.queued)
 
   const [confirmState, setConfirmState] = useState<ConfirmDialogState | null>(null)
 
