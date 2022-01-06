@@ -6,5 +6,5 @@ export function ckeySanitize(key: string): string {
 
 
 export function isStaff(adminFlags: number): boolean {
-  return ((adminFlags & (AdminFlag.R_MENTOR | AdminFlag.R_MOD | AdminFlag.R_ADMIN)) !== 0)
+  return ((adminFlags & (AdminFlag.R_MENTOR | AdminFlag.R_MOD | AdminFlag.R_ADMIN | AdminFlag.R_SERVER)) !== 0)
 }
