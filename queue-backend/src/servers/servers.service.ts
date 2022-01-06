@@ -27,9 +27,8 @@ export class ServersService {
   private readonly redis: IORedis.Redis;
   
   async server(serverPort: string): Promise<ServerStatus> {
-    const status = await this.redis.get(`byond_${serverPort}_status`)
-
-    const { mode, respawn, enter, roundtime, listed, mapname, players, ticker_state, date } = JSON.parse(status) || {}
+    const status = await this.status(serverPort)
+    const { mode, respawn, enter, roundtime, listed, mapname, players, ticker_state, date } = status || {}
     const { name, port, queued, desc, connection_address, order } = servers[serverPort]
 
     const slots = queued ? await this.playerListService.getSlotStats(serverPort) : { max: 0, occupied: players}
@@ -63,6 +62,12 @@ export class ServersService {
     return await Promise.all(Object.keys(servers).map(async serverPort => {
       return await this.server(serverPort)
     }))
+  }
+
+  async status(serverPort: string): Promise<any | null> {
+    const statusString = await this.redis.get(`byond_${serverPort}_status`)
+    const status = statusString ? JSON.parse(statusString) : null
+    return status
   }
 
   @OnEvent(InternalEvent.ByondStatusUpdate, {promisify: true})
