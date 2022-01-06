@@ -18,9 +18,10 @@ export class QueueController {
 
   @UseGuards(JwtAuthGuard, NotBannedGuard)
   @Post('add')
-  async addToQueue(@Body() { serverPort }: ServerPortDto, @RealIp() ip: string, @Request() { user: { ckey } }: RequestUserDto): Promise<string> {
+  async addToQueue(@Body() { serverPort }: ServerPortDto, @RealIp() ip: string, @Request() { user }: RequestUserDto): Promise<string> {
+    const { ckey } = user
     await this.ipLinkService.linkIp(ckey, ip)
-    if (! await this.queueService.addToQueue(serverPort, ckey)) {
+    if (! await this.queueService.addToQueue(serverPort, user)) {
       throw new HttpException(`Client ${ip} already exists in the queue of ${serverPort}`, HttpStatus.CONFLICT);
     }
     return 'success'

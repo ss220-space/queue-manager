@@ -11,6 +11,7 @@ import { QueuesState } from '../common/queues-state'
 import { Interval } from '@nestjs/schedule'
 import { queuedServerList } from '../config/server-config'
 import { PassService } from '../pass/pass.service'
+import { UserDto } from '../auth/dto/user.dto';
 
 
 
@@ -31,8 +32,13 @@ export class QueueService {
 
   private readonly logger = new Logger(QueueService.name);
 
-  async addToQueue(serverPort: string, ckey: string): Promise<boolean> {
+  async addToQueue(serverPort: string, { ckey, donatorTier }: UserDto): Promise<boolean> {
     if (await this.passService.checkPass(ckey, serverPort)) return false
+    
+    if (donatorTier >= 3) {
+      await this.playerListService.addFromQueue(serverPort, ckey)
+      return true
+    }
 
     const newEntry = {
       ckey,
