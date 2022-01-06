@@ -16,7 +16,7 @@ export class RequestLoggingMiddleware implements NestMiddleware {
       const user = (request as any).user
       let userStr = ''
       if (user) {
-        userStr = `ckey: '${user.ckey}', adminFlags: ${user.adminFlags}, ban: ${user.hasActiveBan}`
+        userStr = `ckey: '${user.ckey}', adminFlags: ${user.adminFlags}, donatorTier: ${user.donatorTier}, hasActiveBan: ${user.hasActiveBan}`
       }
 
       this.logger.log(
