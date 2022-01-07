@@ -114,9 +114,7 @@ function Home({ initialServers, renderDate }: InferGetServerSidePropsType<typeof
   useEffect(() => {
     if (renderDate > Date.now() - 10 * 1000) return
     const load = async () => {
-      const res = await fetch(`${backendUrl}/api/v1/servers/status`, {
-        cache: 'no-cache',
-      })
+      const res = await requestBackendData('/api/v1/servers/status')
       setServersStatus(await res.json())
     }
     load()
