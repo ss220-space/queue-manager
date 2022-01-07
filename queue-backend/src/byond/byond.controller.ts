@@ -13,7 +13,7 @@ export class ByondController {
   @Get('playerlist_ext/:serverPort')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(AdminFlag.R_ADMIN, AdminFlag.R_BAN)
-  async getPlayerlistExt(@Param() { serverPort }: ServerPortDto): Promise<string> {
+  async getPlayerlistExt(@Param() { serverPort }: ServerPortDto): Promise<string[]> {
     const result = await this.byondService.getPlayerlistExt(serverPort)
     if (!result) {
       throw new HttpException(`Something bad happend when fetching server_port (${serverPort})`, HttpStatus.CONFLICT)

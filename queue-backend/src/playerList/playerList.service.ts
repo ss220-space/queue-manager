@@ -18,7 +18,7 @@ export class PlayerInfoDto {
 }
 
 export class PlayerListDto {
-  [index: string]: PlayerInfoDto
+  [ckey: string]: PlayerInfoDto
 }
 
 @Injectable()
@@ -98,7 +98,7 @@ export class PlayerListService {
 
         const playerList = await this.getPlayerList(serverPort)
         const keyList = Object.keys(playerList)
-        const newPlayerList = {}
+        const newPlayerList: PlayerListDto = {}
         for (const key of keyList) {
           const ckey = ckeySanitize(key)
           this.logger.debug(`Next player is ${ckey}`)
@@ -123,11 +123,11 @@ export class PlayerListService {
         .map((server) => `${server.port}`)
         .map(serverPort => {
           this.logger.debug(`Fetching ${serverPort}`)
-          return [this.byondService.getPlayerlistExt(serverPort), serverPort]
+          return { playerList: this.byondService.getPlayerlistExt(serverPort), serverPort }
         })
 
-      for (const [playerlist, serverPort] of playerLists) {
-        let fetchedByondPlayerList: string[] = await playerlist;
+      for (const { playerList, serverPort } of playerLists) {
+        let fetchedByondPlayerList: string[] | null = await playerList;
 
         if (!fetchedByondPlayerList) {
           continue
@@ -135,15 +135,15 @@ export class PlayerListService {
         this.logger.debug('fetchedByondPlayerList')
         this.logger.debug(fetchedByondPlayerList)
 
-        fetchedByondPlayerList = fetchedByondPlayerList.map(key => {
+        fetchedByondPlayerList = fetchedByondPlayerList.map((key) => {
           return ckeySanitize(key)
         })
 
-        const lastPlayerList = await this.getPlayerList(<string>serverPort)
+        const lastPlayerList: PlayerListDto = await this.getPlayerList(serverPort)
         this.logger.debug('lastPlayerList')
         this.logger.debug(lastPlayerList)
 
-        const keyList = Object.keys(lastPlayerList || {})
+        const keyList = Object.keys(lastPlayerList)
 
         const allUniqueCkeys = new Set([...keyList, ...fetchedByondPlayerList])
         const updatedPlayerList: PlayerListDto = {}
@@ -172,10 +172,10 @@ export class PlayerListService {
             }
           } else {
             if (lastPlayerList[ckey]) {
-              const lastPresenceTime = lastPlayerList[ckey]?.time
+              const lastPresenceTime = lastPlayerList[ckey].time
               const allowedAwayTime = this.configService.get<number>('queue.ghost_away_threshold')
-              if (Date.now() - lastPresenceTime > allowedAwayTime) {
-                await this.removePlayer(<string>serverPort, ckey)
+              if ((Date.now() - lastPresenceTime) > allowedAwayTime) {
+                await this.removePlayer(serverPort, ckey)
               } else {
                 updatedPlayerList[ckey] = lastPlayerList[ckey]
               }
@@ -187,7 +187,7 @@ export class PlayerListService {
         this.logger.debug('updatedPlayerList')
         this.logger.debug(updatedPlayerList)
 
-        await this.savePlayerList(<string>serverPort, updatedPlayerList)
+        await this.savePlayerList(serverPort, updatedPlayerList)
       }
 
     })

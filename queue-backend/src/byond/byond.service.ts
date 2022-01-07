@@ -33,7 +33,7 @@ export class ByondService {
     }
   };
 
-  async getPlayerlistExt(serverPort: string): Promise<any> {
+  async getPlayerlistExt(serverPort: string): Promise<string[] | undefined> {
     const server = { ...servers[serverPort] }
     const key = server.comms_password ? `&key=${server.comms_password}` : ''
 
@@ -46,13 +46,12 @@ export class ByondService {
 
       if (typeof queryByond !== 'string') return null
 
-      switch (server.format) {
-        case 'json':
-          return await JSON.parse(queryByond)
-        case 'uri':
-          return Object.fromEntries(new URLSearchParams(queryByond).entries())
-        default:
-          return null
+      const parsed = JSON.parse(queryByond)
+      if (Array.isArray(parsed)) {
+        return parsed
+      } else {
+        this.logger.error(`getPlayerlistExt not array with id ${serverPort}\n${queryByond}`)
+        return null
       }
     } catch (err) {
       this.logger.error(`Failed to getPlayerlistExt with id ${serverPort}\n${err}`);
