@@ -3,7 +3,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
 import { RolesGuard } from '../roles/roles.guard'
 import { AdminFlag } from '../roles/adminFlag.enum'
 import { Roles } from '../roles/roles.decorator'
-import { merge, concat, Observable } from 'rxjs'
+import { merge, Observable, map } from 'rxjs'
 import { AdminService } from './admin.service'
 import { MessageEvent } from '@nestjs/common'
 import { StatusEventsService } from '../status-events/status-events.service'
@@ -26,6 +26,13 @@ export class AdminController {
       await this.adminService.playerUpdateEvents(),
       await this.adminService.queueUpdateEvents(),
       this.statusEventsService.statusEventSubject.asObservable(),
+    ).pipe(
+      map((event) => {
+        return {
+          ...event,
+          id: `${Date.now()}`,
+        }
+      }),
     )
   }
 }

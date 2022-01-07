@@ -81,6 +81,12 @@ export class ServersController {
       passUpdates,
       this.statusEventsService.statusEventSubject.asObservable(),
     ).pipe(
+      map((event) => {
+        return {
+          ...event,
+          id: `${Date.now()}`,
+        }
+      }),
       finalize(() => {
         this.statusEventsService.onClientDisconnect(ckey)
         return
