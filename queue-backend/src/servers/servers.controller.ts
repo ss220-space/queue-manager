@@ -58,7 +58,7 @@ export class ServersController {
       }),
       startWith(null),
       pairwise(),
-      filter(([prev, serverQueues]) => serverQueues.length > 0 || prev.length > 0),
+      filter(([prev, serverQueues]) => serverQueues.length > 0 || (prev !== null && prev.length > 0)),
       map(([, serverQueues]) => {
         const event = new QueueEvent()
         event.data = serverQueues
