@@ -25,7 +25,7 @@ import { AdminModule } from './admin/admin.module'
     }),
     RedisModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => configService.get('redis.url'),         // or use async method
+      useFactory: (configService: ConfigService) => configService.get('redis'),         // or use async method
       inject: [ConfigService],
     }),
     PrismaModule,
