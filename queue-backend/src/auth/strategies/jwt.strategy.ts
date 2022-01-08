@@ -23,6 +23,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       ckey: payload.sub,
       adminFlags: payload.roles,
       donatorTier: payload.donor,
+      whitelistPasses: payload.wl,
       hasActiveBan: payload.ban,
     };
   }

@@ -7,7 +7,7 @@ import { ServerPortDto } from '../common/dto/serverPort.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { NotBannedGuard } from '../auth/guards/not-banned.guard';
 import { RealIp } from '../common/decorators/real-ip.decorator';
-
+import { servers } from '@/queue.config.json';
 
 @Controller('queue')
 export class QueueController {
@@ -19,8 +19,11 @@ export class QueueController {
   @UseGuards(JwtAuthGuard, NotBannedGuard)
   @Post('add')
   async addToQueue(@Body() { serverPort }: ServerPortDto, @RealIp() ip: string, @Request() { user }: RequestUserDto): Promise<string> {
-    const { ckey } = user
+    const { ckey, whitelistPasses } = user
     await this.ipLinkService.linkIp(ckey, ip)
+    if (servers[serverPort].whitelisted && !whitelistPasses.includes(parseInt(serverPort))) {
+      throw new HttpException(`Client '${ckey}' doesn't have whitelist pass to ${serverPort}`, HttpStatus.CONFLICT)
+    }
     if (! await this.queueService.addToQueue(serverPort, user)) {
       throw new HttpException(`Client ${ip} already exists in the queue of ${serverPort}`, HttpStatus.CONFLICT);
     }

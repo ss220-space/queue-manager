@@ -30,7 +30,7 @@ export class ServersService {
   async server(serverPort: string): Promise<ServerStatus> {
     const status = await this.status(serverPort)
     const { mode, respawn, enter, roundtime, listed, mapname, players, ticker_state, date } = status || {}
-    const { name, port, queued, desc, connection_address, order } = servers[serverPort]
+    const { name, port, queued, whitelisted, desc, connection_address, order } = servers[serverPort]
 
     const slots = queued ? await this.playerListService.getSlotStats(serverPort) : { max: 0, occupied: players}
     const queueSize = queued ? await this.queueService.queueSize(serverPort) : 0
@@ -54,6 +54,7 @@ export class ServersService {
       connection_address,
       port,
       queued,
+      whitelisted,
       order,
       status: stat,
     }

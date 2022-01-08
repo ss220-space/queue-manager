@@ -18,6 +18,7 @@ export class AuthService {
       sub: ckey,  
       roles: user.adminFlags,
       donor: user.donatorTier,
+      wl: user.whitelistPasses,
       ban: user.hasActiveBan,
     }
     return this.jwtService.sign(jwtPayload, signOptions)
@@ -34,6 +35,7 @@ export class AuthService {
       ckey,
       adminFlags: user.adminFlags,
       donatorTier: user.donatorTier,
+      whitelistPasses: user.whitelistPasses,
       hasActiveBan: ban ? true : false,
     }
   }

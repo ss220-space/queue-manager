@@ -1,5 +1,5 @@
 import { AdminRank } from '@/src/common/enums/adminRank.enum';
-import { IsEnum, IsNotEmpty, IsNumber, Max, Min } from 'class-validator';
+import { IsArray, IsEnum, IsNotEmpty, IsNumber, Max, Min } from 'class-validator';
 
 export class UserPrivilegesDto {
   @IsNotEmpty()
@@ -17,4 +17,7 @@ export class UserPrivilegesDto {
   @Min(0)
   @Max(4)
   donatorTier?: number
+
+  @IsArray()
+  whitelistPasses?: number[]
 }

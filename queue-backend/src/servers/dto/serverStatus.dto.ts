@@ -5,7 +5,8 @@ export class ServerStatus {
   desc: string;
   connection_address: string;
   port: string;
-  queued: string;
+  queued: boolean;
+  whitelisted: boolean;
   order: number;
   status?: {
     ticker_state: TickerState;

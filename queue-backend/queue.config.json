@@ -8,6 +8,7 @@
       "topic": "?status",
       "format": "json",
       "queued": false,
+      "whitelisted": false,
       "desc": "Основной сервер",
       "extra": "(НСН Керберос)",
       "connection_address": "game.ss220.space"
@@ -20,6 +21,7 @@
       "topic": "?status",
       "format": "json",
       "queued": false,
+      "whitelisted": false,
       "desc": "Второй сервер, копия основного для равномерного распределения онлайна",
       "extra": "(НСН Керберос) <b style='color: #2ecc71'>(новый)</b>",
       "connection_address": "game.ss220.space"
@@ -32,6 +34,7 @@
       "topic": "?status",
       "format": "json",
       "queued": true,
+      "whitelisted": false,
       "desc": "Третий сервер, копия основного для равномерного распределения онлайна",
       "extra": "(НСН Керберос) <b style='color: #2ecc71'>(новый)</b>",
       "connection_address": "play.ss220.space",
@@ -44,7 +47,8 @@
       "port": 7722,
       "topic": "?status",
       "format": "json",
-      "queued": false,
+      "queued": true,
+      "whitelisted": true,
       "desc": "здесь играют стримеры",
       "extra": "(НСН Кибериада)",
       "connection_address": "game.ss220.space"
@@ -57,6 +61,7 @@
       "topic": "?status",
       "format": "json",
       "queued": false,
+      "whitelisted": true,
       "desc": "вайтлист, без временных ограничений по профессиям, самозапись через команду <b>/заявка</b> в Discord (Требуется суммарно 75+ часов игрового опыта на EX/Main/Secondary)",
       "extra": "(НСН Керберос/НСН Кибериада)",
       "connection_address": "play.ss220.space"
@@ -69,6 +74,7 @@
       "topic": "?status",
       "format": "json",
       "queued": false,
+      "whitelisted": false,
       "desc": "очень долгие раунды без раундстартовых антагов",
       "extra": "(НСН Кибериада)",
       "connection_address": "ex.ss220.space"
@@ -81,6 +87,7 @@
       "topic": "?status",
       "format": "uri",
       "queued": false,
+      "whitelisted": false,
       "desc": "атмосферное и более требовательное РП, билд Infinity",
       "extra": "(ИКН Сьерра)",
       "connection_address": "play.ss220.space"
@@ -93,6 +100,7 @@
       "topic": "?status",
       "format": "json",
       "queued": true,
+      "whitelisted": true,
       "desc": "Тестовый сервер",
       "extra": "",
       "connection_address": "game.ss220.space",

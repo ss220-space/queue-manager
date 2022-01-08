@@ -42,6 +42,7 @@ export type Server = {
   connection_address: string;
   port: string;
   queued: boolean;
+  whitelisted: boolean;
   order: number;
   status?: {
     ticker_state: number | string | undefined;
