@@ -128,12 +128,12 @@ function Home({ initialServers, renderDate }: InferGetServerSidePropsType<typeof
     }
     load()
 
-    let audio = null
+    let audio: HTMLAudioElement
     try {
       audio = new Audio("bikehorn.mp3")
       audio.volume = 0.1
     } catch(error) {
-      console.log(error)
+      console.error(error)
     }
 
     const eventSource = new EventSourcePolyfill (
