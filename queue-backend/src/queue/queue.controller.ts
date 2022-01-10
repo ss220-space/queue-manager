@@ -21,7 +21,7 @@ export class QueueController {
   async addToQueue(@Body() { serverPort }: ServerPortDto, @RealIp() ip: string, @Request() { user }: RequestUserDto): Promise<string> {
     const { ckey, whitelistPasses } = user
     await this.ipLinkService.linkIp(ckey, ip)
-    if (servers[serverPort].whitelisted && !whitelistPasses.includes(parseInt(serverPort))) {
+    if (servers[serverPort].whitelisted && !whitelistPasses?.includes(parseInt(serverPort))) {
       throw new HttpException(`Client '${ckey}' doesn't have whitelist pass to ${serverPort}`, HttpStatus.CONFLICT)
     }
     if (! await this.queueService.addToQueue(serverPort, user)) {
