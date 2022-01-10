@@ -128,8 +128,13 @@ function Home({ initialServers, renderDate }: InferGetServerSidePropsType<typeof
     }
     load()
 
-    const audio = new Audio("bikehorn.mp3")
-    audio.volume = 0.1
+    let audio: HTMLAudioElement
+    try {
+      audio = new Audio("bikehorn.mp3")
+      audio.volume = 0.1
+    } catch(error) {
+      console.error(error)
+    }
 
     const eventSource = new EventSourcePolyfill (
       `${backendUrl}/api/v1/servers/status-events`,
@@ -187,7 +192,7 @@ function Home({ initialServers, renderDate }: InferGetServerSidePropsType<typeof
 
       for (const port of update) {
         if (!prevPasses.current.has(port)) {
-          audio.play()
+          audio?.play()
           setPassEvents(
             (events) =>
               [
