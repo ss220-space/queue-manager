@@ -1,32 +1,6 @@
-import { useState } from 'react'
 import { Button, Card, Col, Container, Row, Stack, Placeholder, Badge } from 'react-bootstrap'
 import { Fragment, ReactElement } from 'react';
-
-const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL
-
-const DescItemContent = (data: ReactElement | string) => {
-  return (
-    <p className="fs-3 fw-bold mb-0">
-      {data}
-    </p>
-  )
-}
-
-export const DescItem = (title: string, data: ReactElement | string | undefined | null ) => {
-  return (
-    <Stack className='mt-3'>
-      <p className="fs-6 text-muted fw-normal mb-0">
-        {title}
-      </p>
-      { data ?
-        DescItemContent(data) :
-        <Placeholder as="p" size="lg" animation="glow" className="m-0"> 
-          <Placeholder xs={10} className="my-1 py-3"/>
-        </Placeholder>
-      }
-    </Stack>
-  )
-}
+import { requestBackendData } from '../utils';
 
 export enum TickerState {
   Startup = 0,
@@ -87,61 +61,70 @@ const getTickerStateString = (tickerState: number | string | undefined) => {
   }
 }
 
+const DescItemContent = (data: ReactElement | string) => {
+  return (
+    <p className="fs-3 fw-bold mb-0">
+      {data}
+    </p>
+  )
+}
+
+export const DescItem = (title: string, data: ReactElement | string | undefined | null ) => {
+  return (
+    <Stack className='mt-3'>
+      <p className="fs-6 text-muted fw-normal mb-0">
+        {title}
+      </p>
+      { data ?
+        DescItemContent(data) :
+        <Placeholder as="p" size="lg" animation="glow" className="m-0"> 
+          <Placeholder xs={10} className="my-1 py-3"/>
+        </Placeholder>
+      }
+    </Stack>
+  )
+}
+
 export default function ServerCard(server: Server, serverNow: number, token: string, queueLoaded: boolean, queue?: ServerQueue) {
   const isStale: boolean = !server.status || Date.parse(server.status.date) < (serverNow - 60 * 1000)
+  const address = `byond://${server.connection_address}:${server.port}`
 
-  async function handleClick() {
-    if (server.queued && !queue?.hasPass) {
-      const data = {
-        'serverPort': `${server.port}`
-      }
-      let action: string
-      if (queue != null && queue.position != null) {
-        action = `${backendUrl}/api/v1/queue/remove`
-      } else {
-        action = `${backendUrl}/api/v1/queue/add`
-      }
-
-      const response = await fetch(action, {
-        method: 'POST', // *GET, POST, PUT, DELETE, etc.
-        //mode: 'same-origin', // no-cors, *cors, same-origin
-        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-        //credentials: 'same-origin', // include, *same-origin, omit
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        //redirect: 'follow', // manual, *follow, error
-        //referrerPolicy: 'no-referrer', // no-referrer, *client
-        body: JSON.stringify(data), // body data type must match "Content-Type" header
-      });
-    } else {
-      const redirectLink = document.createElement('a')
-      redirectLink.href = `byond://${server.connection_address}:${server.port}`
-      redirectLink.click()
+  async function handleClickQueue() {
+    const data = {
+      'serverPort': `${server.port}`
+    }
+    await requestBackendData(`/api/v1/queue/${queue?.position != null ? 'remove' : 'add'}`, token, 'POST', data)
+  }
+  
+  async function handleClickQuit() {
+    // Check if IE
+    // @ts-ignore
+    if (!!document.documentMode) {
       window.location.href = 'byond://winset?command=.quit'
-      // window.location.href= `byond://${server.connection_address}:${server.port}`
     }
   }
 
-  function playButton(className: string) {
-    if (queue) {
-      if (queue.hasPass) {
-        return (
-          <Button onClick={handleClick} variant="success" className={className}>Подключиться</Button>
-        )
-      }
-      if (queue.position != null) {
-        return (
-          <Button onClick={handleClick} className={className} variant="primary">
-            {"В очереди "}
-            <Badge bg="success">{queue.position+1}</Badge>
-          </Button>
-        )
-      }
+  function playButton(queue: ServerQueue | undefined, isDisabled: boolean, className: string) {
+    if (queue?.hasPass) {
+      return (
+        <Button href={address} disabled={isDisabled} onClick={handleClickQuit} variant="success" className={className}>Подключиться</Button>
+      )
+    }
+    if (queue?.position != null) {
+      return (
+        <Button onClick={handleClickQueue} className={className} variant="primary">
+          В очереди{" "}
+          <Badge bg="success">{queue.position+1}</Badge>
+        </Button>
+      )
+    }
+    if (server.queued) {
+      return (
+        <Button onClick={handleClickQueue} className={className} variant="primary">Играть</Button>
+      )
     }
     return (
-      <Button disabled={server.queued && (!queueLoaded || isStale)} className={className} onClick={handleClick} variant="primary">Играть</Button>
+      <Button href={address} disabled={isDisabled} className={className} onClick={handleClickQuit} variant="primary">Играть</Button>
     )
   }
 
@@ -179,7 +162,7 @@ export default function ServerCard(server: Server, serverNow: number, token: str
 
         </Container>
         <Container className="col-6 mx-auto m-4 mt-3">
-          {playButton("col-12")}
+          {playButton(queue, server.queued && (!queueLoaded || isStale), "col-12")}
         </Container>
       </Card.Body>
     </Card>
