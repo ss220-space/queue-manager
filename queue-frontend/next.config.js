@@ -6,4 +6,5 @@ module.exports = withTM({
   //   config.optimization.minimize = false;
   //   return config;
   // }
+  reactStrictMode: true,
 });
