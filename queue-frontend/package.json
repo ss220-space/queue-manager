@@ -2,9 +2,10 @@
   "name": "queue-master",
   "private": true,
   "scripts": {
-    "dev": "PORT=3001 next dev",
+    "dev": "NODE_OPTIONS='--inspect' PORT=3001 next dev",
     "build": "next build",
     "start": "next start",
+    "start:dev": "PORT=3001 next start",
     "lint": "next lint"
   },
   "dependencies": {
