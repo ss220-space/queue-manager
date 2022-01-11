@@ -15,7 +15,6 @@ $toast-background-color: #333333;
   background-color: #212529;
 }
 
-
 .admin-tab {
   background-color: $card-bg;
 }
@@ -23,9 +22,8 @@ $toast-background-color: #333333;
 @import "~bootstrap/scss/bootstrap.scss";
 @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css");
 
-
 .state-icon {
-  font-size: 1.2rem
+  font-size: 1.2rem;
 }
 
 .bi-check-circle.state-icon {
@@ -34,4 +32,8 @@ $toast-background-color: #333333;
 
 .bi-x-circle.state-icon {
   color: $danger;
+}
+
+.card {
+  height: 100%;
 }
