@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { servers } from '@/queue.config.json'
-import fetchByondTopic from './byondTopic'
+import { fetchTopic } from 'byond-fetch'
 
 @Injectable()
 export class ByondService {
@@ -11,7 +11,7 @@ export class ByondService {
     const key = server.comms_password ? `&key=${server.comms_password}` : ''
 
     try {
-      const queryByond = await fetchByondTopic({
+      const queryByond = await fetchTopic({
         ip: server.ip,
         port: server.port,
         topic: `${server.topic}${key}`,
@@ -38,7 +38,7 @@ export class ByondService {
     const key = server.comms_password ? `&key=${server.comms_password}` : ''
 
     try {
-      const queryByond = await fetchByondTopic({
+      const queryByond = await fetchTopic({
         ip: server.ip,
         port: server.port,
         topic: `?playerlist_ext${key}`,

@@ -2424,6 +2424,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"byond-fetch@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "byond-fetch@npm:1.0.2"
+  dependencies:
+    promise-socket: ^7.0.0
+  checksum: 7cbbaa18b3088580329c2299299159abc5cea61403085ad88552ce75c75b3d7ea1e85b40672ed36e328c8eb9de5baddf9bacfca9ddc83a347126741820f4f983
+  languageName: node
+  linkType: hard
+
 "bytes@npm:3.1.0":
   version: 3.1.0
   resolution: "bytes@npm:3.1.0"
@@ -6097,6 +6106,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": 5.8.0
     "@typescript-eslint/parser": 5.8.0
     async-mutex: ^0.3.2
+    byond-fetch: ^1.0.2
     class-transformer: ^0.5.1
     class-validator: ^0.13.2
     dotenv: 10.0.0

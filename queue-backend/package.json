@@ -33,6 +33,7 @@
     "@prisma/client": "3.7.0",
     "@types/ioredis": "^4.28.5",
     "async-mutex": "^0.3.2",
+    "byond-fetch": "^1.0.2",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.13.2",
     "dotenv": "10.0.0",
