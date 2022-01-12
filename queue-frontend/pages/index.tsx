@@ -251,7 +251,7 @@ function Home({ initialServers, renderDate }: InferGetServerSidePropsType<typeof
       { BanModal({ token, profile }) }
 
       <Container fluid>
-        <Row xs={1} md={2} lg={3}>
+        <Row xs={1} sm={2} md={2} lg={3} xl={4}>
           {serversStatus.servers.sort((a, b) => a.order - b.order).map(server => (
             <Col className='p-3' key={server.name}>
               { ServerCard(server, serversStatus.now, token, queue != null, queue?.[server.port]) }
