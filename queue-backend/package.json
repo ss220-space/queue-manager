@@ -30,7 +30,7 @@
     "@nestjs/platform-ws": "^8.2.4",
     "@nestjs/schedule": "^1.0.2",
     "@nestjs/websockets": "^8.2.4",
-    "@prisma/client": "3.7.0",
+    "@prisma/client": "^3.10.0",
     "@types/ioredis": "^4.28.5",
     "async-mutex": "^0.3.2",
     "byond-fetch": "^1.0.2",

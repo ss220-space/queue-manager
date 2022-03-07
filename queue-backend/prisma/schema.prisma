@@ -378,6 +378,26 @@ model whitelist {
   @@index([ckey], map: "ckey")
 }
 
+model ban_whitelist {
+  id         Int    @id @default(autoincrement())
+  ckey       String @db.VarChar(32)
+  computerid String @db.VarChar(32)
+
+  @@index([ckey], map: "ckey")
+  @@index([computerid], map: "computerid")
+}
+
+model budget {
+  id         Int       @id @default(autoincrement())
+  date       DateTime  @default(now()) @db.DateTime(0)
+  ckey       String    @db.VarChar(32)
+  amount     Int       @db.UnsignedInt
+  source     String    @db.VarChar(32)
+  date_start DateTime  @default(now()) @db.DateTime(0)
+  date_end   DateTime? @default(dbgenerated("(current_timestamp() + interval 1 month)")) @db.DateTime(0)
+  is_valid   Boolean   @default(true)
+}
+
 enum changelog_cl_type {
   FIX
   WIP
