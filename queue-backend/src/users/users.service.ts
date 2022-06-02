@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UseFilters } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   admin as AdminModel,
   donators as DonatorsModel,
+  budget as BudgetModel,
   ban as BanModel,
   ckey_whitelist as CkeyWhitelistModel,
   Prisma,
@@ -42,6 +43,33 @@ export class UsersService {
     return this.prisma.donators.findFirst({
       where: donatorsWhereInput,
     });
+
+  }
+
+  async budget(ckey: string): Promise<number | null> {
+    const record = await this.prisma.budget.aggregate({
+      _sum: {
+        amount: true,
+      },
+      where: { 
+        ckey,
+        is_valid: true,
+        date_start: {
+          lte: dateNormilized(),
+        },
+        OR: [
+          {
+            date_end: {
+              gt: dateNormilized(),
+            },
+          },
+          {
+            date_end: null,
+          },
+        ],
+      }
+    })
+    return record._sum.amount;
   }
 
   async ckeyWhitelists(params: {
@@ -69,16 +97,14 @@ export class UsersService {
       },
     })
 
-    const donator = await this.donator({
-      ckey, 
-      active: true,
-      start_date: {
-        lte: dateNormilized(),
-      },
-      end_date: {
-        gt: dateNormilized(),
-      },
-    })
+    let donatorTier
+    const budget = await this.budget(ckey)
+    if (budget) {
+      if (budget >= 100) donatorTier = 1
+      if (budget >= 300) donatorTier = 2
+      if (budget >= 500) donatorTier = 3
+      if (budget >= 1000) donatorTier = 4
+    }
 
     const wlPassActive = await this.ckeyWhitelists({
       where: {
@@ -106,7 +132,7 @@ export class UsersService {
       ckey: ckey,
       adminRank: <keyof typeof AdminRank> admin?.rank,
       adminFlags: admin?.flags,
-      donatorTier: donator?.tier,
+      donatorTier,
       whitelistPasses: whitelistPasses,
     };
   }
