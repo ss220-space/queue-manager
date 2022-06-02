@@ -35,7 +35,7 @@ export class QueueService {
   async addToQueue(serverPort: string, { ckey, donatorTier }: UserDto): Promise<boolean> {
     if (await this.passService.checkPass(ckey, serverPort)) return false
     
-    if (donatorTier >= 3) {
+    if (donatorTier >= 2) {
       await this.playerListService.addFromQueue(serverPort, ckey)
       return true
     }
