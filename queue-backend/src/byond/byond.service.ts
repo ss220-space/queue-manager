@@ -41,7 +41,7 @@ export class ByondService {
       const queryByond = await fetchTopic({
         ip: server.ip,
         port: server.port,
-        topic: `?playerlist_ext${key}`,
+        topic: `?playerlist_ext&format=json${key}`,
       })
 
       if (typeof queryByond !== 'string') return null
