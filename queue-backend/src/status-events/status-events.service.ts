@@ -110,9 +110,9 @@ export class StatusEventsService {
 
   async onClientConnect({ckey, adminFlags}: UserDto, ip: string) {
     await this.ipLinkService.linkIp(ckey, ip)
-    if (isStaff(adminFlags)) {
-      this.passService.addPassesForCkey(ckey)
-    }
+    // if (isStaff(adminFlags)) {
+    //   this.passService.addPassesForCkey(ckey)
+    // }
 
     if (!this.clientConnections[ckey]) {
       this.clientConnections[ckey] = new ClientConnectionCounter(

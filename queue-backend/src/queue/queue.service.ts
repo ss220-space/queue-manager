@@ -12,6 +12,7 @@ import { Interval } from '@nestjs/schedule'
 import { queuedServerList } from '../config/server-config'
 import { PassService } from '../pass/pass.service'
 import { UserDto } from '../auth/dto/user.dto';
+import { isStaff } from '../common/utils';
 
 
 
@@ -32,8 +33,18 @@ export class QueueService {
 
   private readonly logger = new Logger(QueueService.name);
 
-  async addToQueue(serverPort: string, { ckey, donatorTier }: UserDto): Promise<boolean> {
+  async addToQueue(serverPort: string, { ckey, donatorTier, adminFlags, whitelistPasses }: UserDto): Promise<boolean> {
     if (await this.passService.checkPass(ckey, serverPort)) return false
+
+    if (isStaff(adminFlags)) {
+      if (serverPort === '7722' && whitelistPasses?.includes(parseInt(serverPort))) {
+        await this.playerListService.addFromQueue(serverPort, ckey)
+        return true
+      } else if (serverPort !== '7722') {
+        await this.playerListService.addFromQueue(serverPort, ckey)
+        return true
+      }
+    }
     
     if (donatorTier >= 2) {
       await this.playerListService.addFromQueue(serverPort, ckey)
