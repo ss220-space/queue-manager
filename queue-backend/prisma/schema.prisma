@@ -127,14 +127,15 @@ model characters {
 }
 
 model ckey_whitelist {
-  id         Int       @id @default(autoincrement())
-  date       DateTime  @default(now()) @db.DateTime(0)
-  ckey       String    @db.VarChar(32)
-  adminwho   String    @db.VarChar(32)
-  port       Int       @db.UnsignedInt
-  date_start DateTime  @default(now()) @db.DateTime(0)
-  date_end   DateTime? @db.DateTime(0)
-  is_valid   Boolean   @default(true)
+  id           Int       @id @default(autoincrement())
+  date         DateTime  @default(now()) @db.DateTime(0)
+  ckey         String    @db.VarChar(32)
+  adminwho     String    @db.VarChar(32)
+  port         Int       @db.UnsignedInt
+  date_start   DateTime  @default(now()) @db.DateTime(0)
+  date_end     DateTime? @db.DateTime(0)
+  is_valid     Boolean   @default(true)
+  is_blocktime Int?      @default(0) @db.TinyInt
 }
 
 model connection_log {
