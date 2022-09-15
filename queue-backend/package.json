@@ -41,7 +41,7 @@
     "ipaddr.js": "^2.0.1",
     "jspack": "^0.0.4",
     "nestjs-redis": "git+https://github.com/skunight/nestjs-redis.git",
-    "passport": "^0.5.2",
+    "passport": "^0.6.0",
     "passport-jwt": "^4.0.0",
     "promise-socket": "^7.0.0",
     "reflect-metadata": "0.1.13",
