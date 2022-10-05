@@ -24,3 +24,9 @@ Built with Nest.JS. Technologies used:
 
 ### Queue Frontend
 Built with Next.JS.
+
+![image](https://user-images.githubusercontent.com/8555356/194173725-4caa53f7-992d-4506-86e0-208225bb453d.png)
+
+
+![image](https://user-images.githubusercontent.com/8555356/194173637-f781b14e-bc5c-4c15-b141-75884bbe7b79.png)
+
