@@ -10,7 +10,7 @@
 Built with Rust and use iptables wrapper. It connects to queue backend via websockets;
 
 ### Game Lobby Server
-Only contains browser to authenticate players and open frontend;
+Essentially just IE-based DM browser to authenticate players and open frontend;
 
 ### Queue Backend
 Built with Nest.JS. Technologies used:
