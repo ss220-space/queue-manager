@@ -35,7 +35,7 @@
     "async-mutex": "^0.3.2",
     "byond-fetch": "^1.0.2",
     "class-transformer": "^0.5.1",
-    "class-validator": "^0.13.2",
+    "class-validator": "^0.14.0",
     "dotenv": "10.0.0",
     "helmet": "^5.0.1",
     "ipaddr.js": "^2.0.1",
