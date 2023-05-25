@@ -38,7 +38,6 @@ var/global/datum/http_system/SShttp
         cb
     )
 
-
 /client/proc/on_client_authorize(datum/http_response/response)
     world.log << "Response [src] [response.body]"
     var/list/resp = json_decode(response.body)
